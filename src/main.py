@@ -6,7 +6,7 @@ from exporter.json_formatter import format_json
 from config.settings_reader import ler_configuracoes
 from config.configuration import iniciar_configuracao
 
-def main():
+def executar_com_argumentos():
     parser = argparse.ArgumentParser(description='Gera um JSON com a estrutura de arquivos.')
     parser.add_argument('--path', type=str, help='Caminho da pasta base a ser escaneada.')
     parser.add_argument('--output', type=str, help='Nome do arquivo de saída JSON.')
@@ -50,6 +50,12 @@ def main():
         json.dump(resultado, f, ensure_ascii=False, indent=2)
 
     print(f"[OK] JSON gerado em: {output_file}")
+
+def main():
+    while True:
+        from cli.controller import continuar
+        if not continuar():
+            break
 
 if __name__ == "__main__":
     main()
