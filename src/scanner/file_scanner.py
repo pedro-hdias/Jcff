@@ -1,11 +1,7 @@
 import os
+from .filters import is_valid_file, should_ignore
 
-EXTENSOES_SUPORTADAS = ['.epub', '.txt', '.pdf']
-
-def scan_directory(path, ignore_list=None, base_dir=None):
-    if ignore_list is None:
-        ignore_list = []
-
+def scan_directory(path, ignore_list=None, allowed_extensions=None, base_dir=None):
     if base_dir is None:
         base_dir = path
 
@@ -17,18 +13,23 @@ def scan_directory(path, ignore_list=None, base_dir=None):
         return {}
 
     for item in itens:
-        if item.startswith('.') or item in ignore_list:
+        if item.startswith('.') or should_ignore(item, ignore_list):
             continue
 
         caminho_completo = os.path.join(path, item)
 
         if os.path.isdir(caminho_completo):
-            subestrutura = scan_directory(caminho_completo, ignore_list, base_dir)
+            subestrutura = scan_directory(
+                caminho_completo,
+                ignore_list=ignore_list,
+                allowed_extensions=allowed_extensions,
+                base_dir=base_dir
+            )
             if subestrutura:
                 estrutura.setdefault("categorias", {})[item] = subestrutura
+
         elif os.path.isfile(caminho_completo):
-            _, ext = os.path.splitext(item)
-            if ext.lower() in EXTENSOES_SUPORTADAS:
+            if is_valid_file(item, allowed_extensions):
                 caminho_relativo = os.path.relpath(caminho_completo, base_dir)
                 if "arquivos" not in estrutura:
                     estrutura["arquivos"] = []

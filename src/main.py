@@ -8,6 +8,8 @@ def main():
     parser = argparse.ArgumentParser(description='Gera um JSON com a estrutura de arquivos.')
     parser.add_argument('--path', type=str, default='.', help='Caminho da pasta base a ser escaneada.')
     parser.add_argument('--output', type=str, default='saida.json', help='Nome do arquivo de saída JSON.')
+    parser.add_argument('--ignore', nargs='*', help='Lista de padrões de arquivos ou pastas a ignorar (ex: *.log temp*)')
+    parser.add_argument('--ext', nargs='*', help='Lista de extensões de arquivos permitidas (ex: .pdf .txt .epub)')
 
     args = parser.parse_args()
     base_path = os.path.abspath(args.path)
@@ -19,7 +21,11 @@ def main():
     print(f"[INFO] Escaneando a pasta: {base_path}")
 
     estrutura = {
-        "secoes": scan_directory(base_path)
+        "secoes": scan_directory(
+            path=base_path,
+            ignore_list=args.ignore,
+            allowed_extensions=args.ext
+        )
     }
 
     resultado = format_json(estrutura)
