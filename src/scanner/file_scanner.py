@@ -1,7 +1,10 @@
 import os
 from .filters import is_valid_file, should_ignore
+from utils import errors
+from utils.logger import registrar
 
 def scan_directory(path, ignore_list=None, allowed_extensions=None, base_dir=None):
+    registrar(f"Escaneando diretório: {path}", nivel="info", local="scan_directory")
     if base_dir is None:
         base_dir = path
 
@@ -10,13 +13,14 @@ def scan_directory(path, ignore_list=None, allowed_extensions=None, base_dir=Non
     try:
         itens = sorted(os.listdir(path))
     except PermissionError:
-        return {}
+        errors.show_simple_error(f"Permissão negada para acessar o diretório: {path}")
 
     for item in itens:
         if item.startswith('.') or should_ignore(item, ignore_list):
             continue
 
         caminho_completo = os.path.join(path, item)
+        registrar(f"Analisando item: {item}", nivel="debug", local="scan_directory")
 
         if os.path.isdir(caminho_completo):
             subestrutura = scan_directory(
@@ -41,4 +45,6 @@ def scan_directory(path, ignore_list=None, allowed_extensions=None, base_dir=Non
     if "arquivos" in estrutura:
         estrutura["qtd_arquivos"] = len(estrutura["arquivos"])
 
+    registrar(f"Estrutura do diretório '{path}': {estrutura}", nivel="debug", local="scan_directory")
+    registrar(f"Finalizando escaneamento do diretório: {path} com sucesso.", nivel="info", local="scan_directory")
     return estrutura

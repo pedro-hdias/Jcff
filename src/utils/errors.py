@@ -2,18 +2,18 @@ import traceback
 import os
 import json
 from utils.context_manager import is_cli
+from utils.logger import registrar
 
-
-def _emit_error(message):
+def _emit_error(message, local):
     if is_cli():
         print(message)
+        registrar(message, nivel="error", local=local)
     else:
-        from utils import logger  # futuro logger.py
-        logger.registrar(message, nivel="erro")
+        registrar(message, nivel="error", local=local)
 
 
-def show_simple_error(error, context="Erro"):
-    _emit_error(f"[ERRO] {context}: {str(error)}")
+def show_simple_error(message, local):
+    _emit_error(f"[ERRO] {message}", local)
 
 
 def show_full_error(error, context="Erro"):
@@ -24,27 +24,31 @@ def show_full_error(error, context="Erro"):
 
 def validate_directory(path):
     if not os.path.isdir(path):
-        raise ValueError(f"O caminho '{path}' não é um diretório válido.")
-
+        return False
+    return True
 
 def validate_access(path):
-    if not os.path.exists(path):
-        raise FileNotFoundError(f"O caminho '{path}' não existe.")
     if not os.access(path, os.R_OK):
-        raise PermissionError(f"Sem permissão para acessar '{path}'.")
+        return False
+    return True
 
 
 def validate_not_empty(value, label="valor"):
     if not value.strip():
-        raise ValueError(f"O {label} não pode ser vazio.")
+        return False
+    return True
 
+def validate_file_name(value):
+    if not value.isalnum() or not value:
+        return False
+    return True
 
 def get_int_input(prompt, default=None):
     try:
         value = input(prompt)
-        return int(value)
+        return True
     except ValueError:
-        raise ValueError("Valor numérico inválido.")
+        registrar(f"Erro: valor inválido '{value}'.", nivel="error", local="erro")
 
 
 def safe_json_write(path, data):
@@ -63,3 +67,8 @@ def safe_listdir(path):
     except Exception as e:
         show_simple_error(e, f"Erro ao listar o diretório '{path}'")
         return []
+
+def exists_path(path):
+    if not os.path.exists(path):
+        return False
+    return True
