@@ -7,6 +7,7 @@ from exporter.json_formatter import format_json
 from config.settings_reader import ler_configuracoes
 from config.configuration import iniciar_configuracao
 from interface.menu import exibir_menu
+from interface.gui import exibir_interface
 from utils.logger import registrar
 from utils.context_manager import set_context, get_context, is_cli, is_gui
 
@@ -22,7 +23,7 @@ def executar_com_argumentos():
     registrar(f"Argumentos recebidos: {sys.argv[1:]}", nivel="debug", local="controller")
 
     if args.config:
-        registrar("Configuração interativa iniciada via argumento", nivel="info", local="controller")
+        registrar("Configuração interativa solicitada via argumento", nivel="info", local="controller")
         iniciar_configuracao()
         return
 
@@ -79,8 +80,8 @@ def continuar():
         return False
 
     if is_gui():
-        registrar("Modo .exe detectado. GUI ativada.", nivel="info", local="controller")
-        # GUI será implementada futuramente
+        registrar("Modo .exe detectado. GUI será ativada.", nivel="info", local="controller")
+        exibir_interface()
         return False
 
     registrar("Nenhum argumento detectado. Entrando no menu interativo via terminal.", nivel="info", local="controller")
