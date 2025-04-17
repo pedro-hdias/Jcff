@@ -1,26 +1,33 @@
 import traceback
 import os
 import json
+
+from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QMessageBox
+from PySide6.QtCore import Qt
+
 from utils.context_manager import is_cli
 from utils.logger import registrar
 
-def _emit_error(message, local):
+def _emit_error(message, local, window=None):
     if is_cli():
         print(message)
         registrar(message, nivel="error", local=local)
     else:
+        QMessageBox.warning(
+            window,
+            "Erro",
+            message,
+            QMessageBox.Ok,
+        )
         registrar(message, nivel="error", local=local)
-
 
 def show_simple_error(message, local):
     _emit_error(f"[ERRO] {message}", local)
-
 
 def show_full_error(error, context="Erro"):
     _emit_error(f"[ERRO] {context}: {str(error)}")
     if is_cli():
         traceback.print_exc()
-
 
 def validate_directory(path):
     if not os.path.isdir(path):
