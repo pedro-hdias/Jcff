@@ -1,8 +1,8 @@
 import json
 import os
 
-from config.settings_reader import ler_configuracoes
-from config.configuration import iniciar_configuracao
+from config.cli.settings_reader import ler_configuracoes
+from config.cli.configuration import iniciar_configuracao
 from scanner.file_scanner import scan_directory
 from exporter.json_formatter import format_json
 from utils import errors
