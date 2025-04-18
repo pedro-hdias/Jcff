@@ -1,66 +1,70 @@
-import os
-from configparser import ConfigParser
-from .settings_writer import salvar_configuracoes
-from utils import errors
-from utils.logger import registrar
+from PySide6.QtWidgets import (
+    QDialog, QLabel, QLineEdit, QPushButton, QFileDialog,
+    QHBoxLayout, QVBoxLayout, QFormLayout, QMessageBox, QWidget
+)
+from PySide6.QtCore import Qt
 
-def _set_path():
-    """
-    Define o caminho padrão para o arquivo de configuração.
-    Se o caminho não for válido, solicita ao usuário um novo caminho.
-    """
-    path = input("Digite um caminho de diretório válido, por exemplo: C:/Users/SeuUsuario/Documentos/\n")
-    while not errors.validate_not_empty(path) and not errors.exists_path(path) and not errors.validate_access(path) and not errors.validate_directory(path):
-        errors.show_simple_error(f"O caminho '{path}' não é um diretório válido.", "configuration")
-        _set_path()
-    return path
+class TelaConfiguracao(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Configuração do Programa")
+        self.setMinimumSize(600, 400)
 
-def _set_output_file():
-    """
-    Define o nome do arquivo de saída.
-    Se o nome não for válido, solicita ao usuário um novo nome.
-    """
-    output = input("Digite o nome do arquivo de saída (sem extensão): ").strip()
-    registrar(f"Nome do arquivo recebido: {output}", nivel="debug", local="configuration")
-    while not errors.validate_not_empty(output) and not errors.validate_file_name(output):
-        errors.show_simple_error(f"O nome '{output}' não é válido.", "configuration")
-        _set_output_file()
-    return f"{output}.json"
+        layout_geral = QVBoxLayout()
+        layout_campos = QFormLayout()
 
-def iniciar_configuracao():
-    speech("🔧 Iniciando configuração interativa:\n")
+        # === Diretório Base ===
+        self.input_diretorio = QLineEdit()
+        btn_pasta = QPushButton("📁")
+        btn_ajuda_pasta = QPushButton("❓")
 
-    path = _set_path()
-    registrar(f"Caminho padrão: {path}", nivel="debug", local="configuration")
+        linha_diretorio = QHBoxLayout()
+        linha_diretorio.addWidget(self.input_diretorio)
+        linha_diretorio.addWidget(btn_pasta)
+        linha_diretorio.addWidget(btn_ajuda_pasta)
+        layout_campos.addRow("Diretório base:", linha_diretorio)
 
-    output = _set_output_file()
-    registrar(f"Nome do arquivo de saída: {output}", nivel="debug", local="configuration")
+        # === Arquivo de saída ===
+        self.input_saida = QLineEdit()
+        btn_arquivo = QPushButton("📄")
+        btn_ajuda_saida = QPushButton("❓")
 
-    extensoes = input("Extensões permitidas separadas por vírgula (ex: .pdf,.epub,.txt) [Enter para nenhuma]: ").strip()
-    if extensoes:
-        extensoes = [ext.strip() for ext in extensoes.split(",")]
-        registrar(f"Extensões permitidas: {extensoes}", nivel="debug", local="configuration")
-    else:
-        extensoes = []
-        registrar("Nenhuma extensão permitida definida", nivel="debug", local="configuration")
+        linha_saida = QHBoxLayout()
+        linha_saida.addWidget(self.input_saida)
+        linha_saida.addWidget(btn_arquivo)
+        linha_saida.addWidget(btn_ajuda_saida)
+        layout_campos.addRow("Arquivo de saída:", linha_saida)
 
-    ignorar = input("Padrões a ignorar separados por vírgula (ex: *.log,temp*,__pycache__) [Enter para nenhum]: ").strip()
-    if ignorar:
-        ignorar = [p.strip() for p in ignorar.split(",")]
-        registrar(f"Padrões a ignorar: {ignorar}", nivel="debug", local="configuration")
-    else:
-        ignorar = []
-        registrar("Nenhum padrão a ignorar definido", nivel="debug", local="configuration")
+        # === Extensões permitidas ===
+        self.input_extensoes = QLineEdit()
+        btn_extensoes = QPushButton("📜")
+        btn_ajuda_extensoes = QPushButton("❓")
 
-    configuracoes = {
-        "default_path": path,
-        "default_output": output,
-        "extensions": extensoes,
-        "ignore": ignorar
-    }
+        linha_extensoes = QHBoxLayout()
+        linha_extensoes.addWidget(self.input_extensoes)
+        linha_extensoes.addWidget(btn_extensoes)
+        linha_extensoes.addWidget(btn_ajuda_extensoes)
+        layout_campos.addRow("Extensões permitidas:", linha_extensoes)
 
-    salvar_configuracoes(configuracoes)
-    speech("\n✅ Arquivo de configuração criado com sucesso!")
+        # === Padrões a ignorar ===
+        self.input_ignorar = QLineEdit()
+        btn_ajuda_ignorar = QPushButton("❓")
 
-if __name__ == "__main__":
-    iniciar_configuracao()
+        linha_ignorar = QHBoxLayout()
+        linha_ignorar.addWidget(self.input_ignorar)
+        linha_ignorar.addWidget(btn_ajuda_ignorar)
+        layout_campos.addRow("Ignorar padrões:", linha_ignorar)
+
+        # === Botões finais (Salvar e Cancelar) ===
+        btn_salvar = QPushButton("💾 Salvar")
+        btn_cancelar = QPushButton("❌ Cancelar")
+        linha_botoes = QHBoxLayout()
+        linha_botoes.setAlignment(Qt.AlignCenter)
+        linha_botoes.addWidget(btn_salvar)
+        linha_botoes.addWidget(btn_cancelar)
+
+        # === Montagem final ===
+        layout_geral.addLayout(layout_campos)
+        layout_geral.addLayout(linha_botoes)
+
+        self.setLayout(layout_geral)
