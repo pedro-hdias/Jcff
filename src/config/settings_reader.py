@@ -1,6 +1,5 @@
 import os
 from configparser import ConfigParser
-from config.configuration import iniciar_configuracao
 from utils import errors
 
 def ler_configuracoes(caminho_config="config/settings.conf"):
