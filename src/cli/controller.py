@@ -2,10 +2,11 @@ import argparse
 import os
 import json
 import sys
+
 from scanner.file_scanner import scan_directory
 from exporter.json_formatter import format_json
 from config.settings_reader import ler_configuracoes
-from config.configuration import iniciar_configuracao
+from config.cli.configuration import iniciar_configuracao
 from interface.menu import exibir_menu
 from interface.gui import exibir_interface
 from utils.logger import registrar
@@ -28,6 +29,9 @@ def executar_com_argumentos():
         return
 
     config_padrao = ler_configuracoes()
+    if not config_padrao:
+        print("[Erro] Não foi possível ler o arquivo de configuração. Iniciando configuração interativa.")
+        iniciar_configuracao()
 
     base_path = os.path.abspath(args.path) if args.path else os.path.abspath(config_padrao.get("default_path", "."))
     output_file = args.output or config_padrao.get("default_output", "saida.json")

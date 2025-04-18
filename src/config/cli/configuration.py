@@ -1,6 +1,6 @@
 import os
 from configparser import ConfigParser
-from .settings_writer import salvar_configuracoes
+from config.settings_writer import salvar_configuracoes
 from utils import errors
 from utils.logger import registrar
 

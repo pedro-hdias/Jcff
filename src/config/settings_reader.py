@@ -1,16 +1,12 @@
 import os
 from configparser import ConfigParser
-from config.gui.configuration import iniciar_configuracao
+from config.configuration import iniciar_configuracao
 from utils import errors
-from utils.logger import registrar
-from utils.speech import speech
 
 def ler_configuracoes(caminho_config="config/settings.conf"):
     if not errors.exists_path(caminho_config):
         errors.show_simple_error(f"Arquivo de configuração não encontrado: {caminho_config}", "ler_configuracoes")
-        speech("Iniciando a configuração.")
-        iniciar_configuracao()
-
+        return False
 
     config = ConfigParser()
     config.read(caminho_config, encoding='utf-8')
