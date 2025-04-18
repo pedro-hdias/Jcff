@@ -4,7 +4,7 @@ import os
 from PySide6.QtWidgets import QMessageBox
 
 from config.settings_reader import ler_configuracoes
-from config.gui.configuration import iniciar_configuracao
+from config.gui.configuration import TelaConfiguracao
 from scanner.file_scanner import scan_directory
 from exporter.json_formatter import format_json
 from utils import errors
@@ -22,6 +22,9 @@ def dialogo_informativo(title_window, message):
 def executar_com_configuracao_salva():
     speech("Executando com configuração salva")
     config = ler_configuracoes()
+    if not config:
+        registrar("Nenhuma configuração salva encontrada. Iniciando configuração interativa.", nivel="warning", local="menu")
+        iniciar_configuracao()
 
     path = os.path.abspath(config.get("default_path", "."))
     output = config.get("default_output", "saida.json")
@@ -30,6 +33,7 @@ def executar_com_configuracao_salva():
     speech("Carregamento das configurações realizado. Iniciando validação das configurações.")
 
     registrar(f"Executando com config salva - path: {path}, output: {output}, ext: {ext}, ignore: {ignore}", nivel="debug", local="menu")
+
 
     if not errors.validate_directory(path):
         registrar(f"Caminho inválido na config: {path}", nivel="error", local="menu")
