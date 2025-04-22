@@ -1,7 +1,10 @@
 import json
 import os
 
-from PySide6.QtWidgets import QMessageBox
+from PySide6.QtWidgets import (
+    QDialog, QLabel, QLineEdit, QPushButton, QFileDialog,
+    QHBoxLayout, QVBoxLayout, QFormLayout, QMessageBox, QWidget
+)
 
 from config.settings_reader import ler_configuracoes
 from config.gui.configuration import TelaConfiguracao
@@ -23,8 +26,8 @@ def executar_com_configuracao_salva():
     speech("Executando com configuração salva")
     config = ler_configuracoes()
     if not config:
-        registrar("Nenhuma configuração salva encontrada. Iniciando configuração interativa.", nivel="warning", local="menu")
-        iniciar_configuracao()
+        registrar("Nenhuma configuração salva encontrada.", nivel="warning", local="action")
+        dialogo_informativo("Nenhuma configuração salva", "Nenhuma configuração salva encontrada. Por favor, configure primeiro.")
 
     path = os.path.abspath(config.get("default_path", "."))
     output = config.get("default_output", "saida.json")
@@ -36,7 +39,7 @@ def executar_com_configuracao_salva():
 
 
     if not errors.validate_directory(path):
-        registrar(f"Caminho inválido na config: {path}", nivel="error", local="menu")
+        registrar(f"Caminho inválido na config: {path}", nivel="error", local="actions")
         errors.show_simple_error(f"[ERRO] Caminho inválido: {path}", "Actions")
         return
 
@@ -49,7 +52,7 @@ def executar_com_configuracao_salva():
     with open(output, 'w', encoding='utf-8') as f:
         json.dump(format_json(estrutura), f, ensure_ascii=False, indent=2)
 
-    registrar(f"Arquivo JSON salvo com configuração salva em: {output}", nivel="info", local="menu")
+    registrar(f"Arquivo JSON salvo com configuração salva em: {output}", nivel="info", local="actions")
     dialogo_informativo("Arquivo JSON Gerado", f"Arquivo JSON salvo em: {output}")
 
 def executar_com_personalizacao():

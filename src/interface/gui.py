@@ -3,6 +3,7 @@ import sys
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QMessageBox
 from PySide6.QtCore import Qt
 
+from config.gui.configuration import TelaConfiguracao
 from interface import actions
 from utils.logger import registrar
 from utils.speech import speech
@@ -10,13 +11,14 @@ from utils.speech import speech
 app = QApplication(sys.argv)
 window = QWidget()
 layout_vertical = QVBoxLayout()
+tela_configuracao = TelaConfiguracao()
 
 def acao(executar):
     match executar:
         case "1":
             actions.executar_com_configuracao_salva()
         case "2":
-            executar_com_personalizacao()
+            actions.executar_com_personalizacao()
         case "3":
             exibir_configuracao_salva()
         case "4":

@@ -2,7 +2,6 @@ from PySide6.QtWidgets import (
     QDialog, QLabel, QLineEdit, QPushButton, QFileDialog,
     QHBoxLayout, QVBoxLayout, QFormLayout, QMessageBox, QWidget
 )
-from PySide6.QtCore import Qt
 
 class TelaConfiguracao(QDialog):
     def __init__(self):
