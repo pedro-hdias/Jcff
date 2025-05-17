@@ -40,7 +40,7 @@ def validate_access(path):
     return True
 
 
-def validate_not_empty(value, label="valor"):
+def validate_not_empty(value):
     if not value.strip():
         return False
     return True

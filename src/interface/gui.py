@@ -4,21 +4,27 @@ from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, Q
 from PySide6.QtCore import Qt
 
 from config.gui.configuration import TelaConfiguracao
-from interface import actions
+from interface.actions import preset_configuration, custon_execution
 from utils.logger import registrar
 from utils.speech import speech
 
 app = QApplication(sys.argv)
 window = QWidget()
 layout_vertical = QVBoxLayout()
-tela_configuracao = TelaConfiguracao()
+tela_configuracao = TelaConfiguracao()      
 
 def acao(executar):
     match executar:
         case "1":
-            actions.executar_com_configuracao_salva()
+            try:
+                preset_configuration.executar_com_configuracao_salva() 
+            except Exception as e:
+                registrar(f"Erro ao executar com configuração salva: {e}", nivel="error", local="gui")
         case "2":
-            actions.executar_com_personalizacao()
+            try:
+                custon_execution.ExecucaoCustomizada().executar()
+            except Exception as e:
+                registrar(f"Erro ao executar com valores personalizados: {e}", nivel="error", local="gui")
         case "3":
             exibir_configuracao_salva()
         case "4":
@@ -26,7 +32,6 @@ def acao(executar):
         case "5":
             speech("Encerrando...\n")
 
-    QMessageBox.information(window, "Ação executada", msg)
 
 def criar_botao(texto, mensagem_log, executar):
     botao = QPushButton(texto)
