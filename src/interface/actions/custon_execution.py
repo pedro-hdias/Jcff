@@ -78,7 +78,6 @@ class ExecucaoCustomizada(QDialog):
 
         registrar(f"Arquivo JSON salvo com parâmetros personalizados em: {output}", nivel="info", local="ExecucaoCustomizada")
         self.dialogs(f"Arquivo JSON Gerado", f"Arquivo JSON salvo em: {output}")
-        speech("Arquivo JSON gerado com sucesso.")
         self.close()
 
     def executar(self):
@@ -95,6 +94,7 @@ class ExecucaoCustomizada(QDialog):
         btn_pasta.setAccessibleName("Diretório")
         btn_pasta.setToolTip("Clique para selecionar o diretório base.")
         btn_pasta.clicked.connect(lambda: self.input_diretorio.setText(QFileDialog.getExistingDirectory(self, "Selecione o diretório base")))
+
         btn_ajuda_pasta = QPushButton("❓")
         btn_ajuda_pasta.setAccessibleName("Ajuda")
         btn_ajuda_pasta.setToolTip("Clique para abrir a ajuda sobre o diretório base.")
