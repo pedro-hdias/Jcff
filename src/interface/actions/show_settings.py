@@ -70,3 +70,6 @@ class ExibirConfiguracao(QDialog):
 
         btn_editar.clicked.connect(self.abrir_edicao)
         btn_fechar.clicked.connect(self.close)
+
+        self.setLayout(layout_geral)
+        self.show()
