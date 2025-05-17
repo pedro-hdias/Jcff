@@ -176,3 +176,4 @@ cython_debug/
 # genéricos
 *.json
 *.conf  
+*.code-workspace
