@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, Q
 from PySide6.QtCore import Qt
 
 from config.gui.configuration import TelaConfiguracao
-from interface.actions import preset_configuration, custon_execution
+from interface.actions import preset_configuration, custon_execution, show_settings
 from utils.logger import registrar
 from utils.speech import speech
 
@@ -26,12 +26,19 @@ def acao(executar):
             except Exception as e:
                 registrar(f"Erro ao executar com valores personalizados: {e}", nivel="error", local="gui")
         case "3":
-            exibir_configuracao_salva()
+            try:
+                show_settings.ExibirConfiguracao().executar()
+            except Exception as e:
+                registrar(f"Erro ao exibir configuração salva: {e}", nivel="error", local="gui")
         case "4":
-            iniciar_configuracao()
+            try:
+                tela_configuracao.executar()
+            except Exception as e:
+                registrar(f"Erro ao abrir tela de configuração: {e}", nivel="error", local="gui")
         case "5":
             speech("Encerrando...\n")
-
+            registrar("Encerrando o programa", nivel="info", local="gui")
+            sys.exit(0)
 
 def criar_botao(texto, mensagem_log, executar):
     botao = QPushButton(texto)
