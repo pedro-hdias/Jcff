@@ -1,10 +1,11 @@
 import os
-from .filters import is_valid_file, should_ignore
+from scanner.filters import is_valid_file, should_ignore
 from utils import errors
 from utils.logger import registrar
 
 def scan_directory(path, ignore_list=None, allowed_extensions=None, base_dir=None):
     registrar(f"Escaneando diretório: {path}", nivel="info", local="scan_directory")
+    registrar(f"Parâmetros de escaneamento: ignore_list={ignore_list}, allowed_extensions={allowed_extensions}, base_dir={base_dir}", nivel="debug", local="scan_directory")
     if base_dir is None:
         base_dir = path
 
@@ -17,6 +18,7 @@ def scan_directory(path, ignore_list=None, allowed_extensions=None, base_dir=Non
 
     for item in itens:
         if item.startswith('.') or should_ignore(item, ignore_list):
+            registrar(f"Ignorando item: {item}", nivel="debug", local="scan_directory")
             continue
 
         caminho_completo = os.path.join(path, item)
