@@ -1,25 +1,35 @@
 from PySide6.QtWidgets import (
-    QDialog, QLabel, QLineEdit, QPushButton, QHBoxLayout, QVBoxLayout, QFormLayout, QMessageBox
+    QDialog, QLineEdit, QPushButton, QHBoxLayout, QVBoxLayout, QFormLayout
 )
 from PySide6.QtCore import Qt
+
 from config.settings_reader import ler_configuracoes
 from config.gui.configuration import TelaConfiguracao
+from utils import errors
+from utils.logger import registrar
+from utils.speech import speech
 
 class ExibirConfiguracao(QDialog):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Configuração Salva (Somente Leitura)")
+        self.setWindowTitle("Configuração Salva")
         self.setMinimumSize(600, 400)
 
-    def abrir_edicao(self):
+    def _abrir_edicao(self):
+        registrar("Abrindo tela de edição das configurações", nivel="info", local="ExibirConfiguracao")
         tela = TelaConfiguracao()
-        # aguardar a edição e atualizar a tela
         tela.executar()
         self.close()
-        self.executar()
 
     def executar(self):
+        speech("Exibindo configuração atual")
+        registrar("Exibindo configuração atual", nivel="info", local="ExibirConfiguracao") 
+
         config = ler_configuracoes()
+
+        registrar("configuração carregada", nivel="info", local="ExibirConfiguracao")
+        registrar(config, nivel="debug", local="ExibirConfiguracao")
+
         layout_geral = QVBoxLayout()
         layout_campos = QFormLayout()
 
@@ -68,8 +78,9 @@ class ExibirConfiguracao(QDialog):
         layout_geral.addLayout(linha_botoes)
         self.setLayout(layout_geral)
 
-        btn_editar.clicked.connect(self.abrir_edicao)
-        btn_fechar.clicked.connect(self.close)
+        btn_editar.clicked.connect(lambda: self._abrir_edicao())
+        btn_fechar.clicked.connect(lambda: self.close())
 
         self.setLayout(layout_geral)
         self.show()
+        registrar("Exibindo tela", nivel="info", local="ExibirConfiguracao")
