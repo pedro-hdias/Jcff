@@ -24,7 +24,7 @@ class ExecucaoCustomizada(QDialog):
         self.input_ignorar = None
 
     def dialogs(self, titulo, mensagem):
-        registrar(f"Exibindo diálogo: {titulo} - {mensagem}", nivel="info", local="ExecucaoCustomizada")
+        registrar(f"Exibindo diálogo: {titulo} - {mensagem}", nivel="debug", local="ExecucaoCustomizada")
         dialogo = QMessageBox(self)
         dialogo.setWindowTitle(titulo)
         dialogo.setText(mensagem)
@@ -151,12 +151,12 @@ class ExecucaoCustomizada(QDialog):
         self.input_ignorar = QLineEdit()
         self.input_ignorar.setAccessibleName("Padrões a serem ignorados")
         self.input_ignorar.setToolTip("Insira os padrões a serem ignorados, separados por vírgula.")
-        self.input_ignorar.setPlaceholderText("Ex: .git,.svn")
+        self.input_ignorar.setPlaceholderText("Ex: *.git, *.log, *.tmp")
 
         btn_ajuda_ignorar = QPushButton("❓")
         btn_ajuda_ignorar.setAccessibleName("Ajuda")
         btn_ajuda_ignorar.setToolTip("Clique para abrir a ajuda sobre os padrões a serem ignorados.")
-        btn_ajuda_ignorar.clicked.connect(lambda: QMessageBox.information(self, "Ajuda", "Insira os padrões a serem ignorados, separados por vírgula. Por exemplo: .php,.html,.css"))
+        btn_ajuda_ignorar.clicked.connect(lambda: QMessageBox.information(self, "Ajuda", "Insira os padrões a serem ignorados, separados por vírgula. Por exemplo: *.php, *.html, *.css"))
 
         linha_ignorar = QHBoxLayout()
         linha_ignorar.addWidget(self.input_ignorar)
@@ -168,7 +168,7 @@ class ExecucaoCustomizada(QDialog):
         btn_salvar.setToolTip("Clique para executar a geração do arquivo JSON.")
         btn_salvar.clicked.connect(lambda: self._gerar_arquivo())
 
-        btn_cancelar = QPushButton("⏹️")
+        btn_cancelar = QPushButton("❌")
         btn_cancelar.setAccessibleName("Cancelar")
         btn_cancelar.setToolTip("Clique para cancelar a execução.")
         btn_cancelar.clicked.connect(lambda: (registrar("Execução personalizada cancelada", nivel="info", local="ExecucaoCustomizada"), self.close()))
