@@ -67,9 +67,20 @@ Se o programa for empacotado como executável (`main.exe`), basta dar duplo cliq
 A interface gráfica será aberta, permitindo configurar e gerar o JSON de forma visual.
 
 ## Observações
+
 - O arquivo de configuração padrão é salvo em `config/settings.conf`.
 - Os logs de execução ficam na pasta `logs/`.
 - O JSON gerado terá a estrutura de diretórios e arquivos conforme os filtros definidos.
+
+## Contribuindo
+
+Contribuições são bem-vindas! Sinta-se à vontade para abrir issues ou pull requests. Para contribuir, siga os passos:
+1. Faça um fork do repositório.
+2. Crie uma branch para sua feature: `git checkout -b minha-feature`.
+3. Faça suas alterações e commit: `git commit -m '<feat, update, fix> Adicionando nova feature'`.
+4. Envie para o repositório remoto: `git push origin minha-feature`.
+5. Siga o workflow do projeto.
+6. Abra um Pull Request.
 
 ## Licença
 
