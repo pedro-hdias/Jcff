@@ -1,0 +1,41 @@
+name: Create Final Release Tag
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  tag_and_cleanup:
+    if: github.event.pull_request.merged == true  # Somente continua se o PR foi mergeado
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout main branch
+      - name: Checkout main branch
+        uses: actions/checkout@v2
+        with:
+          ref: main
+          fetch-depth: 0
+
+      # Get the version from the release branch
+      - name: Extract Version from Release Branch
+        id: extract_version
+        run: |
+          release_branch=${{ github.event.pull_request.head.ref }}
+          version=${release_branch#release-}  # Extrai a versão da branch
+          echo "RELEASE_VERSION=$version" >> $GITHUB_ENV
+
+      # Create the final tag
+      - name: Create Final Tag
+        run: |
+          git tag "v${{ env.RELEASE_VERSION }}"
+          git push origin "v${{ env.RELEASE_VERSION }}"
+
+      # Optionally delete the release branch
+      - name: Delete Release Branch
+        run: |
+          git push origin --delete ${{ github.event.pull_request.head.ref }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
