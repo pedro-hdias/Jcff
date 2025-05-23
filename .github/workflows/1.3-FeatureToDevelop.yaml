@@ -1,0 +1,56 @@
+name: Major Handling and PR Creation
+
+on:
+  push:
+    branches:
+      - feature/*
+
+jobs:
+  create-feature-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout branch that triggered the workflow
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Set up git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Extract clean branch name
+        run: |
+          echo "clean_branch_name=$(echo ${{ github.ref_name }} | sed 's/^feature\///')" >> $GITHUB_ENV
+
+      - name: Ensure patch label exists
+        run: |
+          gh label create "major" --color "#D73A49" --description "Indicates a patch change" || echo "Label already exists"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check for existing PRs
+        id: check_pr
+        run: |
+          existing_pr=$(gh pr list --head ${{ github.ref_name }} --state open --json number --jq '.[0].number')
+          if [ -z "$existing_pr" ]; then
+            echo "No existing PRs found for this branch."
+            echo "create_pr=true" >> $GITHUB_ENV
+          else
+            echo "Existing PR found: #$existing_pr"
+            echo "create_pr=false" >> $GITHUB_ENV
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Adicionar essa linha
+      - name: Create Pull Request directly
+        if: env.create_pr == 'true'  # Condição que verifica se deve criar o PR
+        run: |
+          gh pr create \
+            --head ${{ github.ref_name }} \
+            --base develop \
+            --title "Major: ${{ env.clean_branch_name }}" \
+            --body "This is a major PR created from the branch ${{ github.ref_name }}." \
+            --label "major"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
