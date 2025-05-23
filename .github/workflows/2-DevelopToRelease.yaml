@@ -1,0 +1,109 @@
+name: Release Creation Workflow
+
+on:
+  pull_request:
+    types: [closed]  # Aciona o workflow quando um PR é fechado
+    branches:
+      - develop  # Apenas quando o PR é fechado na develop
+
+jobs:
+  create_release:
+    if: github.event.pull_request.merged == true  # Apenas continua se o PR foi mergeado
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the develop branch
+      - name: Checkout develop branch
+        uses: actions/checkout@v2
+        with:
+          ref: develop
+          fetch-depth: 0  # Garante que todas as tags sejam baixadas
+
+      # Check if there is an existing PR from develop to release-[tag]
+      - name: Check for Existing PR
+        id: check_pr
+        run: |
+          pr_exists=$(gh pr list --head develop --base release-v* --state open --json number --jq '.[0].number')
+          if [ -n "$pr_exists" ]; then
+            echo "There is an open PR from develop to release. Exiting."
+            exit 0
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Identify the type of PR (patch, minor, major)
+      - name: Get PR Label
+        id: get_label
+        run: |
+          label=$(gh pr view ${{ github.event.pull_request.number }} --json labels --jq '.labels[].name')
+          echo "PR_LABEL=$label" >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Get the latest tag and clean the 'v' prefix
+      - name: Get Latest Tag
+        id: get_tag
+        run: |
+          latest_tag=$(git tag --sort=-creatordate | head -n 1) || echo "v0.0.0"  # Pega a tag mais recente
+          clean_tag=${latest_tag#v}  # Remove o prefixo 'v'
+          echo "LATEST_TAG=$clean_tag" >> $GITHUB_ENV
+
+      # Calculate the next version based on the label and handle negative values
+      - name: Calculate Next Version
+        id: calculate_version
+        run: |
+          IFS='.' read -r major minor patch <<< "${{ env.LATEST_TAG }}"
+          next_version=""
+
+          if [[ "${{ env.PR_LABEL }}" == "patch" ]]; then
+            next_patch=$((patch + 1))
+            # Corrigir se patch for negativo
+            if [ "$next_patch" -lt 0 ]; then
+              next_patch=0
+            fi
+            next_version="$major.$minor.$next_patch"
+          elif [[ "${{ env.PR_LABEL }}" == "minor" ]]; then
+            next_minor=$((minor + 1))
+            # Corrigir se minor for negativo
+            if [ "$next_minor" -lt 0 ]; then
+              next_minor=0
+            fi
+            next_version="$major.$next_minor.0"
+          elif [[ "${{ env.PR_LABEL }}" == "major" ]]; then
+            next_major=$((major + 1))
+            # Corrigir se major for negativo
+            if [ "$next_major" -lt 0 ]; then
+              next_major=0
+            fi
+            next_version="$next_major.0.0"
+          fi
+
+          echo "NEXT_VERSION=$next_version" >> $GITHUB_ENV
+
+      # Checkout main and create a new release branch
+      - name: Checkout main branch and create release branch
+        run: |
+          git checkout main
+          git checkout -b release-v${{ env.NEXT_VERSION }}
+          git push origin release-v${{ env.NEXT_VERSION }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Create the new release
+      - name: Create Release
+        run: |
+          gh release create "v${{ env.NEXT_VERSION }}" --title "Release v${{ env.NEXT_VERSION }}" --notes "Automatic release based on merged PR"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Create a PR from develop to release-[tag]
+      - name: Create Pull Request from develop to release
+        run: |
+          gh pr create \
+            --head develop \
+            --base release-v${{ env.NEXT_VERSION }} \
+            --title "Merge Develop into Release v${{ env.NEXT_VERSION }}" \
+            --body "This PR merges the develop branch into release-v${{ env.NEXT_VERSION }}." \
+            --label "release"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
