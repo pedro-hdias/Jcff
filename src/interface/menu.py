@@ -9,7 +9,7 @@ from utils import errors
 from utils.logger import record_activity
 
 def display_main_menu():
-    record_activity("Menu interativo iniciado", nivel="info", local="menu")
+    record_activity("Interactive Menu Started", nivel="info", local="menu")
     while True:
         print("\n===== MENU PRINCIPAL =====")
         print("1 - Executar com configuração salva")
@@ -18,34 +18,34 @@ def display_main_menu():
         print("4 - Configurar")
         print("5 - Sair")
 
-        opcao = input("Escolha uma opção: ").strip()
-        if not errors.validate_not_empty(opcao) and not errors.get_int_input(opcao):
-            record_activity(f"Input recebido no menu: {opcao}", nivel="debug", local="menu")
-            errors.show_simple_error("Opção inválida. Digite um número entre 1 e 5.")
-        record_activity(f"Input recebido no menu: {opcao}", nivel="debug", local="menu")
+        menu_option = input("Escolha uma opção: ").strip()
+        if not errors.validate_not_empty(menu_option) and not errors.get_int_input(menu_option):
+            record_activity(f"Input received in the menu: {menu_option}", nivel="debug", local="menu")
+            errors.show_simple_error("Invalid option. Enter a number between 1 and 5.")
+        record_activity(f"Input received in the menu: {menu_option}", nivel="debug", local="menu")
 
-        match opcao:
+        match menu_option:
             case "1":
-                record_activity("Opção 1 selecionada: executar com configuração salva", nivel="info", local="menu")
-                executar_com_configuracao_salva()
+                record_activity("Option 1 selected: Executar com configuração salva", nivel="info", local="menu")
+                execute_with_saved_config()
             case "2":
-                record_activity("Opção 2 selecionada: executar com valores personalizados", nivel="info", local="menu")
-                executar_com_personalizacao()
+                record_activity("Option 2 selected: Executar com valores personalizados", nivel="info", local="menu")
+                run_with_custom_values()
             case "3":
-                record_activity("Opção 3 selecionada: ver configuração salva", nivel="info", local="menu")
-                exibir_configuracao_salva()
+                record_activity("Option 3 selected: mostrar configurações salvas", nivel="info", local="menu")
+                show_saved_settings()
             case "4":
-                record_activity("Opção 4 selecionada: iniciar configuração interativa", nivel="info", local="menu")
+                record_activity("Option 4 selected: iniciar configuração interativa", nivel="info", local="menu")
                 initialize_configuration()
             case "5":
                 record_activity("Opção 5 selecionada: sair do programa", nivel="info", local="menu")
                 print("Encerrando...\n")
                 return
             case _:
-                record_activity(f"Opção inválida: {opcao}", nivel="warning", local="menu")
+                record_activity(f"Invalid option: {menu_option}", nivel="warning", local="menu")
                 print("Opção inválida.")
 
-def executar_com_configuracao_salva():
+def execute_with_saved_config():
     config = load_configurations()
 
     path = os.path.abspath(config.get("default_path", "."))
@@ -53,24 +53,24 @@ def executar_com_configuracao_salva():
     ext = config.get("extensions", [])
     ignore = config.get("ignore", [])
 
-    record_activity(f"Executando com config salva - path: {path}, output: {output}, ext: {ext}, ignore: {ignore}", nivel="debug", local="menu")
+    record_activity(f"Running with loaded settings - path: {path}, output: {output}, ext: {ext}, ignore: {ignore}", nivel="debug", local="menu")
 
     if not errors.validate_directory(path):
-        record_activity(f"Caminho inválido na config: {path}", nivel="error", local="menu")
+        record_activity(f"Invalid path at settings: {path}", nivel="error", local="menu")
         print(f"[ERRO] Caminho inválido: {path}")
         return
 
-    estrutura = {
+    json_output = {
         "secoes": scan_directory(path, ignore, ext)
     }
 
     with open(output, 'w', encoding='utf-8') as f:
-        json.dump(format_json(estrutura), f, ensure_ascii=False, indent=2)
+        json.dump(format_json(json_output), f, ensure_ascii=False, indent=2)
 
-    record_activity(f"Arquivo JSON salvo com configuração salva em: {output}", nivel="info", local="menu")
+    record_activity(f"Json file saved with saved configuration in: {output}", nivel="info", local="menu")
     print(f"Arquivo salvo em: {output}")
 
-def executar_com_personalizacao():
+def run_with_custom_values():
     path = input("Caminho para escanear: ").strip()
     output = input("Nome do arquivo de saída: ").strip() or "saida.json"
     ext = input("Extensões permitidas (.pdf,.txt,...): ").strip().split(",")
@@ -80,26 +80,26 @@ def executar_com_personalizacao():
     ignore = [i.strip() for i in ignore if i.strip()]
     path = os.path.abspath(path)
 
-    record_activity(f"Personalização - path: {path}, output: {output}, ext: {ext}, ignore: {ignore}", nivel="debug", local="menu")
+    record_activity(f"Personalization - path: {path}, output: {output}, ext: {ext}, ignore: {ignore}", nivel="debug", local="menu")
 
     if not os.path.isdir(path):
-        record_activity(f"Caminho inválido informado na personalização: {path}", nivel="error", local="menu")
+        record_activity(f"Invalid path informed in personalization: {path}", nivel="error", local="menu")
         print(f"[ERRO] Caminho inválido: {path}")
         return
 
-    estrutura = {
+    json_output = {
         "secoes": scan_directory(path, ignore, ext)
     }
 
     with open(output, 'w', encoding='utf-8') as f:
-        json.dump(format_json(estrutura), f, ensure_ascii=False, indent=2)
+        json.dump(format_json(json_output), f, ensure_ascii=False, indent=2)
 
-    record_activity(f"Arquivo JSON salvo com parâmetros personalizados em: {output}", nivel="info", local="menu")
+    record_activity(f"JSON File saved with custom parameters in: {output}", nivel="info", local="menu")
     print(f"Arquivo salvo em: {output}")
 
-def exibir_configuracao_salva():
-    config = load_configurations()
-    record_activity(f"Exibindo configuração salva: {config}", nivel="debug", local="menu")
+def show_saved_settings():
+    loaded_config = load_configurations()
+    record_activity(f"Showing Save Configuration: {loaded_config}", nivel="debug", local="menu")
     print("\n===== CONFIGURAÇÃO SALVA =====")
-    for chave, valor in config.items():
+    for chave, valor in loaded_config.items():
         print(f"{chave}: {valor}")
