@@ -1,11 +1,11 @@
 import os
 from scanner.filters import is_valid_file, should_ignore
 from utils import errors
-from utils.logger import registrar
+from utils.logger import record_activity
 
 def scan_directory(path, ignore_list=None, allowed_extensions=None, base_dir=None):
-    registrar(f"Escaneando diretório: {path}", nivel="info", local="scan_directory")
-    registrar(f"Parâmetros de escaneamento: ignore_list={ignore_list}, allowed_extensions={allowed_extensions}, base_dir={base_dir}", nivel="debug", local="scan_directory")
+    record_activity(f"Escaneando diretório: {path}", log_level="info", log_origin="scan_directory")
+    record_activity(f"Parâmetros de escaneamento: ignore_list={ignore_list}, allowed_extensions={allowed_extensions}, base_dir={base_dir}", log_level="debug", log_origin="scan_directory")
     if base_dir is None:
         base_dir = path
 
@@ -18,11 +18,11 @@ def scan_directory(path, ignore_list=None, allowed_extensions=None, base_dir=Non
 
     for item in itens:
         if item.startswith('.') or should_ignore(item, ignore_list):
-            registrar(f"Ignorando item: {item}", nivel="debug", local="scan_directory")
+            record_activity(f"Ignorando item: {item}", log_level="debug", log_origin="scan_directory")
             continue
 
         caminho_completo = os.path.join(path, item)
-        registrar(f"Analisando item: {item}", nivel="debug", local="scan_directory")
+        record_activity(f"Analisando item: {item}", log_level="debug", log_origin="scan_directory")
 
         if os.path.isdir(caminho_completo):
             subestrutura = scan_directory(
@@ -47,6 +47,6 @@ def scan_directory(path, ignore_list=None, allowed_extensions=None, base_dir=Non
     if "arquivos" in estrutura:
         estrutura["qtd_arquivos"] = len(estrutura["arquivos"])
 
-    registrar(f"Estrutura do diretório '{path}': {estrutura}", nivel="debug", local="scan_directory")
-    registrar(f"Finalizando escaneamento do diretório: {path} com sucesso.", nivel="info", local="scan_directory")
+    record_activity(f"Estrutura do diretório '{path}': {estrutura}", log_level="debug", log_origin="scan_directory")
+    record_activity(f"Finalizando escaneamento do diretório: {path} com sucesso.", log_level="info", log_origin="scan_directory")
     return estrutura

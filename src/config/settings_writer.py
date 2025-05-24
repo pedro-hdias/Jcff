@@ -1,7 +1,7 @@
 import os
 from configparser import ConfigParser
 
-def salvar_configuracoes(configuracoes, caminho_config="config/settings.conf"):
+def save_configuration(configuracoes, caminho_config="config/settings.conf"):
     config = ConfigParser()
     config["DEFAULT"] = {
         "default_path": configuracoes.get("default_path", "."),

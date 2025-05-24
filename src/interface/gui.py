@@ -3,89 +3,104 @@ import sys
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QMessageBox
 from PySide6.QtCore import Qt
 
-from config.gui.configuration import TelaConfiguracao
+from config.gui.configuration import ConfigurationDialog
 from interface.actions import preset_configuration, custon_execution, show_settings
-from utils.logger import registrar
+from utils.logger import record_activity
 from utils.speech import speech
 
 app = QApplication(sys.argv)
 window = QWidget()
-layout_vertical = QVBoxLayout()
-tela_configuracao = TelaConfiguracao()      
+vertical_layout = QVBoxLayout()
+configuration_screen = ConfigurationDialog()      
 
-def acao(executar):
-    match executar:
+def execute_action(action_command):
+    match action_command:
         case "1":
             try:
-                preset_configuration.executar_com_configuracao_salva() 
+                preset_configuration.run_with_preset_config() 
             except Exception as e:
-                registrar(f"Erro ao executar com configuração salva: {e}", nivel="error", local="gui")
+                record_activity(
+                    f"Error executing with saved configuration: {e}", log_level="error", log_origin="gui"
+                )
         case "2":
             try:
-                custon_execution.ExecucaoCustomizada().executar()
+                custon_execution.CustomExecution().execute()
             except Exception as e:
-                registrar(f"Erro ao executar com valores personalizados: {e}", nivel="error", local="gui")
+                record_activity(
+                    f"Error when executing with personalized values: {e}", log_level="error", log_origin="gui"
+                )
         case "3":
             try:
-                show_settings.ExibirConfiguracao().executar()
+                show_settings.ConfigurationDisplay().execute()
             except Exception as e:
-                registrar(f"Erro ao exibir configuração salva: {e}", nivel="error", local="gui")
+                record_activity(
+                    f"Error when displaying save configuration: {e}", log_level="error", log_origin="gui"
+                )
         case "4":
             try:
-                tela_configuracao.executar()
+                configuration_screen.execute()
             except Exception as e:
-                registrar(f"Erro ao abrir tela de configuração: {e}", nivel="error", local="gui")
+                record_activity(
+                    f"Error when opening configuration screen: {e}", log_level="error", log_origin="gui"
+                )
         case "5":
             speech("Encerrando...\n")
-            registrar("Encerrando o programa", nivel="info", local="gui")
+            record_activity("Closing the Program", log_level="info", log_origin="gui")
             sys.exit(0)
 
-def criar_botao(texto, mensagem_log, executar):
-    botao = QPushButton(texto)
-    botao.setFixedHeight(35)
-    botao.setFocusPolicy(Qt.StrongFocus)
-    botao.setAutoDefault(True)
-    botao.clicked.connect(lambda: 
-    [registrar(mensagem_log, nivel="info", local="gui"), acao(executar)])
-    botao.setStyleSheet("background-color: #4CAF50; color: white; font-size: 16px; border-radius: 5px;")
-    return botao
+def create_button(button_label, log_message, button_action):
+    button = QPushButton(button_label)
+    button.setFixedHeight(35)
+    button.setFocusPolicy(Qt.StrongFocus)
+    button.setAutoDefault(True)
+    button.clicked.connect(lambda: (
+            record_activity(log_message, log_level="info", log_origin="gui"),
+            execute_action(button_action)
+        )
+    )
+    button.setStyleSheet(
+        "background-color: #4CAF50; color: white; font-size: 16px; border-radius: 5px;"
+    )
+    return button
 
-def exibir_interface():
+def show_gui_interface():
     window.setWindowTitle("Gerador de JSON de Estrutura")
 
-    ben_vindo()
+    show_welcome_message()
 
-    titulo = QLabel("Menu Principal")
-    layout_horizontal = QHBoxLayout()
-    layout_horizontal.addWidget(titulo)
+    title_label = QLabel("Menu Principal")
+    main_menu_layout = QHBoxLayout()
+    main_menu_layout.addWidget(title_label)
     speech("Menu Principal")
 
-    botao1 = criar_botao("Executar com configuração salva", "Opção 1 selecionada", "1")
-    botao2 = criar_botao("Executar com valores personalizados", "Opção 2 selecionada", "2")
-    botao3 = criar_botao("Ver configuração salva", "Opção 3 selecionada", "3")
-    botao4 = criar_botao("Configurar", "Opção 4 selecionada", "4")
-    botao5 = criar_botao("Sair", "Opção 5 selecionada", "5")
+    button_I = create_button("Executar com configuração salva", "Option 1 selected", "1")
+    button_II = create_button(
+        "Executar com valores personalizados", "Option 2 selected", "2"
+    )
+    button_III = create_button("Ver configuração salva", "Option 3 selected", "3")
+    button_IV = create_button("Configurar", "Option 4 selected", "4")
+    button_V = create_button("Sair", "Option 5 selected", "5")
 
-    botao5.clicked.connect(window.close)
+    button_V.clicked.connect(window.close)
 
-    linha1 = QHBoxLayout()
-    linha1.addWidget(botao1)
-    linha1.addWidget(botao2)
+    line_I = QHBoxLayout()
+    line_I.addWidget(button_I)
+    line_I.addWidget(button_II)
 
-    linha2 = QHBoxLayout()
-    linha2.addWidget(botao3)
-    linha2.addWidget(botao4)
+    line_II = QHBoxLayout()
+    line_II.addWidget(button_III)
+    line_II.addWidget(button_IV)
 
-    layout_vertical.addLayout(linha1)
-    layout_vertical.addLayout(linha2)
-    layout_vertical.addWidget(botao5)
+    vertical_layout.addLayout(line_I)
+    vertical_layout.addLayout(line_II)
+    vertical_layout.addWidget(button_V)
 
-    window.setLayout(layout_vertical)
-    registrar("Interface gráfica (PySide6) iniciada", nivel="info", local="gui")
+    window.setLayout(vertical_layout)
+    record_activity("Graphic interface(PySide6) initiated", log_level="info", log_origin="gui")
     window.show()
     app.exec()
 
-def ben_vindo():
+def show_welcome_message():
     speech("Bem-vindo ao Gerador de JSON de Estrutura")
     msg = QMessageBox()
-    registrar("Mensagem de boas-vindas exibida", nivel="info", local="gui")
+    record_activity("Welcome message displayed", log_level="info", log_origin="gui")

@@ -30,8 +30,8 @@ jobs:
       # Create the final tag
       - name: Create Final Tag
         run: |
-          git tag "v${{ env.RELEASE_VERSION }}"
-          git push origin "v${{ env.RELEASE_VERSION }}"
+          git tag "${{ env.RELEASE_VERSION }}"
+          git push origin "${{ env.RELEASE_VERSION }}"
 
       # Optionally delete the release branch
       - name: Delete Release Branch
