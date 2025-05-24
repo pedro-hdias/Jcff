@@ -3,7 +3,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 
-from config.settings_reader import ler_configuracoes
+from config.settings_reader import load_configurations
 from config.gui.configuration import TelaConfiguracao
 from utils import errors
 from utils.logger import record_activity
@@ -25,7 +25,7 @@ class ExibirConfiguracao(QDialog):
         speech("Exibindo configuração atual")
         record_activity("Exibindo configuração atual", nivel="info", local="ExibirConfiguracao") 
 
-        config = ler_configuracoes()
+        config = load_configurations()
 
         record_activity("configuração carregada", nivel="info", local="ExibirConfiguracao")
         record_activity(config, nivel="debug", local="ExibirConfiguracao")

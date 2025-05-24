@@ -4,7 +4,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 
-from config.settings_reader import ler_configuracoes
+from config.settings_reader import load_configurations
 from config.settings_writer import salvar_configuracoes
 from utils import errors
 from utils.logger import record_activity

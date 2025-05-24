@@ -2,7 +2,7 @@ import os
 from configparser import ConfigParser
 from utils import errors
 
-def ler_configuracoes(caminho_config="config/settings.conf"):
+def load_configurations(caminho_config="config/settings.conf"):
     if not errors.exists_path(caminho_config):
         errors.show_simple_error(f"Arquivo de configuração não encontrado: {caminho_config}", "ler_configuracoes")
         return False

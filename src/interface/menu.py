@@ -1,8 +1,8 @@
 import json
 import os
 
-from config.settings_reader import ler_configuracoes
-from config.cli.configuration import iniciar_configuracao
+from config.settings_reader import load_configurations
+from config.cli.configuration import initialize_configuration
 from scanner.file_scanner import scan_directory
 from exporter.json_formatter import format_json
 from utils import errors
@@ -36,7 +36,7 @@ def display_main_menu():
                 exibir_configuracao_salva()
             case "4":
                 record_activity("Opção 4 selecionada: iniciar configuração interativa", nivel="info", local="menu")
-                iniciar_configuracao()
+                initialize_configuration()
             case "5":
                 record_activity("Opção 5 selecionada: sair do programa", nivel="info", local="menu")
                 print("Encerrando...\n")
@@ -46,7 +46,7 @@ def display_main_menu():
                 print("Opção inválida.")
 
 def executar_com_configuracao_salva():
-    config = ler_configuracoes()
+    config = load_configurations()
 
     path = os.path.abspath(config.get("default_path", "."))
     output = config.get("default_output", "saida.json")
@@ -98,7 +98,7 @@ def executar_com_personalizacao():
     print(f"Arquivo salvo em: {output}")
 
 def exibir_configuracao_salva():
-    config = ler_configuracoes()
+    config = load_configurations()
     record_activity(f"Exibindo configuração salva: {config}", nivel="debug", local="menu")
     print("\n===== CONFIGURAÇÃO SALVA =====")
     for chave, valor in config.items():

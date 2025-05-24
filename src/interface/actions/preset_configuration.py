@@ -3,7 +3,7 @@ import os
 
 from PySide6.QtWidgets import QMessageBox
 
-from config.settings_reader import ler_configuracoes
+from config.settings_reader import load_configurations
 from config.gui.configuration import TelaConfiguracao
 from scanner.file_scanner import scan_directory
 from exporter.json_formatter import format_json
@@ -21,7 +21,7 @@ def dialogo_informativo(title_window, message):
 
 def executar_com_configuracao_salva():
     speech("Executando com configuração salva")
-    config = ler_configuracoes()
+    config = load_configurations()
     if not config:
         record_activity("Nenhuma configuração salva encontrada.", nivel="warning", local="action")
         dialogo_informativo("Nenhuma configuração salva", "Nenhuma configuração salva encontrada. Por favor, configure primeiro.")

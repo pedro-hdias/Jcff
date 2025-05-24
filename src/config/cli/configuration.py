@@ -27,7 +27,7 @@ def _set_output_file():
         _set_output_file()
     return f"{output}.json"
 
-def iniciar_configuracao():
+def initialize_configuration():
     print("🔧 Iniciando configuração interativa:\n")
 
     path = _set_path()
@@ -63,4 +63,4 @@ def iniciar_configuracao():
     print("\n✅ Arquivo de configuração criado com sucesso!")
 
 if __name__ == "__main__":
-    iniciar_configuracao()
+    initialize_configuration()
