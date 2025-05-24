@@ -1,8 +1,8 @@
-# Jcff - Gerador de Estrutura de Arquivos em JSON
+# JCFF - JSON Creator From a Folder
 
 ## Descrição
 
-O **Jcff** é uma ferramenta desenvolvida para escanear diretórios do seu computador e gerar um arquivo JSON contendo a estrutura de arquivos e pastas, com opções de filtragem por extensões e padrões a serem ignorados. O programa pode ser utilizado tanto via linha de comando (CLI) quanto por interface gráfica (GUI), facilitando o uso para diferentes perfis de usuários.
+O **JCFF** é uma ferramenta desenvolvida para escanear diretórios do seu computador e gerar um arquivo JSON contendo a estrutura de arquivos e pastas, com opções de filtragem por extensões e padrões a serem ignorados. O programa pode ser utilizado tanto via linha de comando (CLI) quanto por interface gráfica (GUI), facilitando o uso para diferentes perfis de usuários.
 
 ## Funcionalidades
 
