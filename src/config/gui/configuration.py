@@ -5,7 +5,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 
 from config.settings_reader import load_configurations
-from config.settings_writer import salvar_configuracoes
+from config.settings_writer import save_configuration
 from utils import errors
 from utils.logger import record_activity
 from utils.speech import speech
@@ -74,7 +74,7 @@ class TelaConfiguracao(QDialog):
         record_activity("Configurações coletadas com sucesso", nivel="info", local="TelaConfiguracao")
         record_activity(f"Configurações: {configuracoes}", nivel="debug", local="TelaConfiguracao")
         try:
-             salvar_configuracoes(configuracoes)
+             save_configuration(configuracoes)
         except Exception as e:
             errors.show_simple_error(f"Erro ao salvar configurações: {e}", "TelaConfiguracao")
             return
