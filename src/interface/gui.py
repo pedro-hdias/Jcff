@@ -48,15 +48,16 @@ def execute_action(action_command):
             record_activity("Closing the Program", log_level="info", log_origin="gui")
             sys.exit(0)
 
-def create_button(button_label, log_message, execute_action):
+def create_button(button_label, log_message, button_action):
     button = QPushButton(button_label)
     button.setFixedHeight(35)
     button.setFocusPolicy(Qt.StrongFocus)
     button.setAutoDefault(True)
-    button.clicked.connect(lambda: [
-        record_activity(log_message, log_level="info", log_origin="gui"),
-        execute_action(execute_action)
-    ])
+    button.clicked.connect(lambda: (
+            record_activity(log_message, log_level="info", log_origin="gui"),
+            execute_action(button_action)
+        )
+    )
     button.setStyleSheet(
         "background-color: #4CAF50; color: white; font-size: 16px; border-radius: 5px;"
     )
