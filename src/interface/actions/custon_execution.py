@@ -13,173 +13,224 @@ from utils import errors
 from utils.logger import record_activity
 from utils.speech import speech
 
-class ExecucaoCustomizada(QDialog):
+class CustomExecution(QDialog):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Execução personalizada")
         self.setMinimumSize(600, 400)
-        self.input_diretorio = None
-        self.input_saida = None
-        self.input_extensoes = None
-        self.input_ignorar = None
+        self.base_directory_input = None
+        self.output_file_input = None
+        self.allowed_extensions_input = None
+        self.ignored_patterns_input = None
 
-    def dialogs(self, titulo, mensagem):
-        record_activity(f"Exibindo diálogo: {titulo} - {mensagem}", nivel="debug", local="ExecucaoCustomizada")
-        dialogo = QMessageBox(self)
-        dialogo.setWindowTitle(titulo)
-        dialogo.setText(mensagem)
-        dialogo.setStandardButtons(QMessageBox.Ok)
-        dialogo.setIcon(QMessageBox.Information)
-        dialogo.setStyleSheet("background-color: #f0f0f0; color: #333; font-size: 14px;")
-        dialogo.exec_()
+    def show_dialog(self, dialog_title, dialog_message):
+        record_activity(
+            f"Showing dialogue: {dialog_title} - {dialog_message}", nivel="debug", local="CustonExecution"
+        )
+        dialog_window = QMessageBox(self)
+        dialog_window.setWindowTitle(dialog_title)
+        dialog_window.setText(dialog_message)
+        dialog_window.setStandardButtons(QMessageBox.Ok)
+        dialog_window.setIcon(QMessageBox.Information)
+        dialog_window.setStyleSheet(
+            "background-color: #f0f0f0; color: #333; font-size: 14px;"
+        )
+        dialog_window.exec_()
 
-    def _validar_inputs(self):
+    def _validate_input_parameters(self):
         speech("Gerando arquivo JSON com parâmetros personalizados.")
-        if not errors.validate_not_empty(self.input_diretorio.text()):
-            errors.show_simple_error("Diretório base não pode ser vazio.", "ExecucaoCustomizada")
+        if not errors.validate_not_empty(self.base_directory_input.text()):
+            errors.show_simple_error("Diretório base não pode ser vazio.", "CustonExecution")
             return
 
-        if not errors.exists_path(self.input_diretorio.text()):
-            errors.show_simple_error("Diretório base não existe.", "ExecucaoCustomizada")
+        if not errors.exists_path(self.base_directory_input.text()):
+            errors.show_simple_error("Diretório base não existe.", "CustonExecution")
             return
 
-        if not errors.validate_directory(self.input_diretorio.text()):
-            errors.show_simple_error("Diretório base inválido.", "ExecucaoCustomizada")
+        if not errors.validate_directory(self.base_directory_input.text()):
+            errors.show_simple_error("Diretório base inválido.", "CustonExecution")
             return
 
-        if not errors.validate_access(self.input_diretorio.text()):
-            errors.show_simple_error("Acesso ao diretório base negado.", "ExecucaoCustomizada")
+        if not errors.validate_access(self.base_directory_input.text()):
+            errors.show_simple_error("Acesso ao diretório base negado.", "CustonExecution")
             return
 
-        if not errors.validate_not_empty(self.input_saida.text()):
-            errors.show_simple_error("Arquivo de saída não pode ser vazio.", "ExecucaoCustomizada")
+        if not errors.validate_not_empty(self.output_file_input.text()):
+            errors.show_simple_error("Arquivo de saída não pode ser vazio.", "CustonExecution")
             return
 
-    def _gerar_arquivo(self):
-        self._validar_inputs()
+    def _create_json_file(self):
+        self._validate_input_parameters()
 
-        path = self.input_diretorio.text().strip()
-        output = self.input_saida.text().strip()
-        ext = self.input_extensoes.text().strip().split(",")
-        ignore = self.input_ignorar.text().strip().split(",")
+        path = self.base_directory_input.text().strip()
+        output = self.output_file_input.text().strip()
+        ext = self.allowed_extensions_input.text().strip().split(",")
+        ignore = self.ignored_patterns_input.text().strip().split(",")
 
         ext = [e.strip() for e in ext if e.strip()]
         ignore = [i.strip() for i in ignore if i.strip()]
         path = os.path.abspath(path)
 
-        record_activity(f"Personalização - path: {path}, output: {output}, ext: {ext}, ignore: {ignore}", nivel="debug", local="ExecucaoCustomizada")
+        record_activity(
+            f"Personalization - path: {path}, output: {output}, ext: {ext}, ignore: {ignore}", nivel="debug", local="CustonExecution")
 
-        estrutura = {
+        json_output = {
             "secoes": file_scanner.scan_directory(path, ignore, ext)
         }
 
         with open(output, 'w', encoding='utf-8') as f:
-            json.dump(json_formatter.format_json(estrutura), f, ensure_ascii=False, indent=2)
+            json.dump(json_formatter.format_json(json_output), f, ensure_ascii=False, indent=2)
 
-        record_activity(f"Arquivo JSON salvo com parâmetros personalizados em: {output}", nivel="info", local="ExecucaoCustomizada")
-        self.dialogs(f"Arquivo JSON Gerado", f"Arquivo JSON salvo em: {output}")
+        record_activity(
+            f"JSON File saved with custom parameters in: {output}", nivel="info", local="CustonExecution")
+        self.show_dialog(
+            f"Arquivo JSON Gerado", f"Arquivo JSON salvo em: {output}"
+        )
         self.close()
 
-    def executar(self):
+    def execute(self):
         speech("Iniciando execução personalizada")
-        record_activity("Iniciando execução personalizada", nivel="info", local="ExecucaoCustomizada")
-        layout_geral = QVBoxLayout()
-        layout_campos = QFormLayout()
+        record_activity(
+            "Starting Personalized Execution", nivel="info", local="CustonExecution"
+        )
+        main_layout = QVBoxLayout()
+        input_field_layout = QFormLayout()
 
-        self.input_diretorio = QLineEdit()
-        self.input_diretorio.setAccessibleName("Diretório base")
-        self.input_diretorio.setToolTip("Insira o diretório base onde os arquivos estão localizados.")
+        self.base_directory_input = QLineEdit()
+        self.base_directory_input.setAccessibleName("Diretório base")
+        self.base_directory_input.setToolTip(
+            "Insira o diretório base onde os arquivos estão localizados."
+        )
 
-        btn_pasta = QPushButton("📁")
-        btn_pasta.setAccessibleName("Diretório")
-        btn_pasta.setToolTip("Clique para selecionar o diretório base.")
-        btn_pasta.clicked.connect(lambda: self.input_diretorio.setText(QFileDialog.getExistingDirectory(self, "Selecione o diretório base")))
+        btn_select_base_directory = QPushButton("📁")
+        btn_select_base_directory.setAccessibleName("Diretório")
+        btn_select_base_directory.setToolTip("Clique para selecionar o diretório base.")
+        btn_select_base_directory.clicked.connect(lambda: 
+            self.base_directory_input.setText(
+                QFileDialog.getExistingDirectory(
+                    self, "Selecione o diretório base"
+                )
+            )
+        )
 
-        btn_ajuda_pasta = QPushButton("❓")
-        btn_ajuda_pasta.setAccessibleName("Ajuda")
-        btn_ajuda_pasta.setToolTip("Clique para abrir a ajuda sobre o diretório base.")
-        btn_ajuda_pasta.clicked.connect(lambda: self.dialogs("Ajuda", "Selecione o diretório base onde os arquivos estão localizados."))
+        btn_help_directory = QPushButton("❓")
+        btn_help_directory.setAccessibleName("Ajuda")
+        btn_help_directory.setToolTip(
+            "Clique para abrir a ajuda sobre o diretório base."
+        )
+        btn_help_directory.clicked.connect(lambda: 
+            self.show_dialog(
+                "Ajuda", "Selecione o diretório base onde os arquivos estão localizados."
+            )
+        )
 
-        linha_diretorio = QHBoxLayout()
-        linha_diretorio.addWidget(self.input_diretorio)
-        linha_diretorio.addWidget(btn_pasta)
-        linha_diretorio.addWidget(btn_ajuda_pasta)
-        layout_campos.addRow("Diretório base:", linha_diretorio)
+        directory_input_row = QHBoxLayout()
+        directory_input_row.addWidget(self.base_directory_input)
+        directory_input_row.addWidget(btn_select_base_directory)
+        directory_input_row.addWidget(btn_help_directory)
+        input_field_layout.addRow("Diretório base:", directory_input_row)
 
-        self.input_saida = QLineEdit()
-        self.input_saida.setAccessibleName("Arquivo de saída")
-        self.input_saida.setToolTip("Insira o caminho do arquivo de saída.")
-        self.input_saida.setPlaceholderText("Ex: /caminho/para/arquivo.json")
+        self.output_file_input = QLineEdit()
+        self.output_file_input.setAccessibleName("Arquivo de saída")
+        self.output_file_input.setToolTip("Insira o caminho do arquivo de saída.")
+        self.output_file_input.setPlaceholderText("Ex: /caminho/para/arquivo.json")
 
-        btn_arquivo = QPushButton("📄")
-        btn_arquivo.setAccessibleName("Arquivo de saída")
-        btn_arquivo.setToolTip("Clique para selecionar o arquivo de saída.")
-        btn_arquivo.clicked.connect(lambda: self.input_saida.setText(QFileDialog.getSaveFileName(self, "Salvar arquivo de saída", "", "JSON Files (*.json)")[0]))
+        btn_select_output_file = QPushButton("📄")
+        btn_select_output_file.setAccessibleName("Arquivo de saída")
+        btn_select_output_file.setToolTip("Clique para selecionar o arquivo de saída.")
+        btn_select_output_file.clicked.connect(lambda:
+            self.output_file_input.setText(
+                QFileDialog.getSaveFileName(
+                    self, "Salvar arquivo de saída", "", "JSON Files (*.json)"
+                )[0]
+            )
+        )
 
-        btn_ajuda_saida = QPushButton("❓")
-        btn_ajuda_saida.setAccessibleName("Ajuda")
-        btn_ajuda_saida.setToolTip("Clique para abrir a ajuda sobre o arquivo de saída.")
-        btn_ajuda_saida.clicked.connect(lambda: QMessageBox.information(self, "Ajuda", "Selecione o arquivo de saída onde o JSON será salvo."))
+        btn_help_output_file = QPushButton("❓")
+        btn_help_output_file.setAccessibleName("Ajuda")
+        btn_help_output_file.setToolTip(
+            "Clique para abrir a ajuda sobre o arquivo de saída."
+        )
+        btn_help_output_file.clicked.connect(lambda: 
+            QMessageBox.information(
+                self, "Ajuda", "Selecione o arquivo de saída onde o JSON será salvo."
+            )
+        )
 
-        linha_saida = QHBoxLayout()
-        linha_saida.addWidget(self.input_saida)
-        linha_saida.addWidget(btn_arquivo)
-        linha_saida.addWidget(btn_ajuda_saida)
-        layout_campos.addRow("Arquivo de saída:", linha_saida)
+        output_file_row = QHBoxLayout()
+        output_file_row.addWidget(self.output_file_input)
+        output_file_row.addWidget(btn_select_output_file)
+        output_file_row.addWidget(btn_help_output_file)
+        input_field_layout.addRow("Arquivo de saída:", output_file_row)
 
-        self.input_extensoes = QLineEdit()
-        self.input_extensoes.setAccessibleName("Extensões permitidas:")
-        self.input_extensoes.setToolTip("Insira as extensões permitidas, separadas por vírgula.")
-        self.input_extensoes.setPlaceholderText("Ex: .php,.html,.css")
+        self.allowed_extensions_input = QLineEdit()
+        self.allowed_extensions_input.setAccessibleName("Extensões permitidas:")
+        self.allowed_extensions_input.setToolTip(
+            "Insira as extensões permitidas, separadas por vírgula."
+        )
+        self.allowed_extensions_input.setPlaceholderText("Ex: .php,.html,.css")
 
-        btn_extensoes = QPushButton("📜")
-        btn_extensoes.setAccessibleName("Extensões permitidas")
-        btn_extensoes.setToolTip("Clique para selecionar as extensões permitidas.")
-        btn_extensoes.clicked.connect(lambda: self.input_extensoes.setText(QFileDialog.getOpenFileName(self, "Selecionar extensões permitidas", "", "Text Files (*.txt)")[0]))
+        btn_help_allowed_extensions = QPushButton("❓")
+        btn_help_allowed_extensions.setAccessibleName("Ajuda")
+        btn_help_allowed_extensions.setToolTip(
+            "Clique para abrir a ajuda sobre as extensões permitidas."
+        )
+        btn_help_allowed_extensions.clicked.connect(lambda: 
+            QMessageBox.information(
+                self, "Ajuda", "Escreva as extensões permitidas, separadas por vírgula. EX: .php,.html,.css"
+            )
+        )
 
-        btn_ajuda_extensoes = QPushButton("❓")
-        btn_ajuda_extensoes.setAccessibleName("Ajuda")
-        btn_ajuda_extensoes.setToolTip("Clique para abrir a ajuda sobre as extensões permitidas.")
-        btn_ajuda_extensoes.clicked.connect(lambda: QMessageBox.information(self, "Ajuda", "Selecione o arquivo de texto contendo as extensões permitidas."))
+        extensions_input_layout = QHBoxLayout()
+        extensions_input_layout.addWidget(self.allowed_extensions_input)
+        extensions_input_layout.addWidget(btn_help_allowed_extensions)
+        input_field_layout.addRow("Extensões permitidas:", extensions_input_layout)
 
-        linha_extensoes = QHBoxLayout()
-        linha_extensoes.addWidget(self.input_extensoes)
-        linha_extensoes.addWidget(btn_extensoes)
-        linha_extensoes.addWidget(btn_ajuda_extensoes)
-        layout_campos.addRow("Extensões permitidas:", linha_extensoes)
+        self.ignored_patterns_input = QLineEdit()
+        self.ignored_patterns_input.setAccessibleName("Padrões a serem ignorados")
+        self.ignored_patterns_input.setToolTip(
+            "Insira os padrões a serem ignorados, separados por vírgula."
+        )
+        self.ignored_patterns_input.setPlaceholderText("Ex: *.git, *.log, *.tmp")
 
-        self.input_ignorar = QLineEdit()
-        self.input_ignorar.setAccessibleName("Padrões a serem ignorados")
-        self.input_ignorar.setToolTip("Insira os padrões a serem ignorados, separados por vírgula.")
-        self.input_ignorar.setPlaceholderText("Ex: *.git, *.log, *.tmp")
+        btn_help_ignored_patterns = QPushButton("❓")
+        btn_help_ignored_patterns.setAccessibleName("Ajuda")
+        btn_help_ignored_patterns.setToolTip(
+            "Clique para abrir a ajuda sobre os padrões a serem ignorados."
+        )
+        btn_help_ignored_patterns.clicked.connect(lambda: 
+            QMessageBox.information(
+                self, "Ajuda", "Insira os padrões a serem ignorados, separados por vírgula. Por exemplo: *.php, *.html, *.css"
+            )
+        )
 
-        btn_ajuda_ignorar = QPushButton("❓")
-        btn_ajuda_ignorar.setAccessibleName("Ajuda")
-        btn_ajuda_ignorar.setToolTip("Clique para abrir a ajuda sobre os padrões a serem ignorados.")
-        btn_ajuda_ignorar.clicked.connect(lambda: QMessageBox.information(self, "Ajuda", "Insira os padrões a serem ignorados, separados por vírgula. Por exemplo: *.php, *.html, *.css"))
+        ignored_patterns_layout = QHBoxLayout()
+        ignored_patterns_layout.addWidget(self.ignored_patterns_input)
+        ignored_patterns_layout.addWidget(btn_help_ignored_patterns)
+        input_field_layout.addRow("Ignorar padrões:", ignored_patterns_layout)
 
-        linha_ignorar = QHBoxLayout()
-        linha_ignorar.addWidget(self.input_ignorar)
-        linha_ignorar.addWidget(btn_ajuda_ignorar)
-        layout_campos.addRow("Ignorar padrões:", linha_ignorar)
+        btn_execute = QPushButton("▶️")
+        btn_execute.setAccessibleName("Executar")
+        btn_execute.setToolTip("Clique para executar a geração do arquivo JSON.")
+        btn_execute.clicked.connect(lambda: self._create_json_file())
 
-        btn_salvar = QPushButton("▶️")
-        btn_salvar.setAccessibleName("Executar")
-        btn_salvar.setToolTip("Clique para executar a geração do arquivo JSON.")
-        btn_salvar.clicked.connect(lambda: self._gerar_arquivo())
+        btn_cancel_execution = QPushButton("❌")
+        btn_cancel_execution.setAccessibleName("Cancelar")
+        btn_cancel_execution.setToolTip("Clique para cancelar a execução.")
+        btn_cancel_execution.clicked.connect(lambda: 
+            (
+                record_activity("Execução personalizada cancelada", nivel="info", local="CustonExecution"),
+                self.close()
+            )
+        )
 
-        btn_cancelar = QPushButton("❌")
-        btn_cancelar.setAccessibleName("Cancelar")
-        btn_cancelar.setToolTip("Clique para cancelar a execução.")
-        btn_cancelar.clicked.connect(lambda: (record_activity("Execução personalizada cancelada", nivel="info", local="ExecucaoCustomizada"), self.close()))
+        action_buttons_layout = QHBoxLayout()
+        action_buttons_layout.setAlignment(Qt.AlignCenter)
+        action_buttons_layout.addWidget(btn_execute)
+        action_buttons_layout.addWidget(btn_cancel_execution)
 
-        linha_botoes = QHBoxLayout()
-        linha_botoes.setAlignment(Qt.AlignCenter)
-        linha_botoes.addWidget(btn_salvar)
-        linha_botoes.addWidget(btn_cancelar)
+        main_layout.addLayout(input_field_layout)
+        main_layout.addLayout(action_buttons_layout)
 
-        layout_geral.addLayout(layout_campos)
-        layout_geral.addLayout(linha_botoes)
-
-        self.setLayout(layout_geral)
+        self.setLayout(main_layout)
         QWidget.show(self)

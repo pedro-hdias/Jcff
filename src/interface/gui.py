@@ -19,10 +19,12 @@ def execute_action(action_command):
             try:
                 preset_configuration.run_with_preset_config() 
             except Exception as e:
-                record_activity(f"Error executing with saved configuration: {e}", nivel="error", local="gui")
+                record_activity(
+                    f"Error executing with saved configuration: {e}", nivel="error", local="gui"
+                )
         case "2":
             try:
-                custon_execution.ExecucaoCustomizada().executar()
+                custon_execution.CustomExecution().execute()
             except Exception as e:
                 record_activity(f"Error when executing with personalized values: {e}", nivel="error", local="gui")
         case "3":
