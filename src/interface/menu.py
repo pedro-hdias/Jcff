@@ -1,15 +1,15 @@
 import json
 import os
 
-from config.settings_reader import ler_configuracoes
-from config.cli.configuration import iniciar_configuracao
+from config.settings_reader import load_configurations
+from config.cli.configuration import initialize_configuration
 from scanner.file_scanner import scan_directory
 from exporter.json_formatter import format_json
 from utils import errors
-from utils.logger import registrar
+from utils.logger import record_activity
 
-def exibir_menu():
-    registrar("Menu interativo iniciado", nivel="info", local="menu")
+def display_main_menu():
+    record_activity("Interactive Menu Started", log_level="info", log_origin="menu")
     while True:
         print("\n===== MENU PRINCIPAL =====")
         print("1 - Executar com configuração salva")
@@ -18,59 +18,59 @@ def exibir_menu():
         print("4 - Configurar")
         print("5 - Sair")
 
-        opcao = input("Escolha uma opção: ").strip()
-        if not errors.validate_not_empty(opcao) and not errors.get_int_input(opcao):
-            registrar(f"Input recebido no menu: {opcao}", nivel="debug", local="menu")
-            errors.show_simple_error("Opção inválida. Digite um número entre 1 e 5.")
-        registrar(f"Input recebido no menu: {opcao}", nivel="debug", local="menu")
+        menu_option = input("Escolha uma opção: ").strip()
+        if not errors.validate_not_empty(menu_option) and not errors.get_int_input(menu_option):
+            record_activity(f"Input received in the menu: {menu_option}", log_level="debug", log_origin="menu")
+            errors.show_simple_error("Invalid option. Enter a number between 1 and 5.")
+        record_activity(f"Input received in the menu: {menu_option}", log_level="debug", log_origin="menu")
 
-        match opcao:
+        match menu_option:
             case "1":
-                registrar("Opção 1 selecionada: executar com configuração salva", nivel="info", local="menu")
-                executar_com_configuracao_salva()
+                record_activity("Option 1 selected: Executar com configuração salva", log_level="info", log_origin="menu")
+                execute_with_saved_config()
             case "2":
-                registrar("Opção 2 selecionada: executar com valores personalizados", nivel="info", local="menu")
-                executar_com_personalizacao()
+                record_activity("Option 2 selected: Executar com valores personalizados", log_level="info", log_origin="menu")
+                run_with_custom_values()
             case "3":
-                registrar("Opção 3 selecionada: ver configuração salva", nivel="info", local="menu")
-                exibir_configuracao_salva()
+                record_activity("Option 3 selected: mostrar configurações salvas", log_level="info", log_origin="menu")
+                show_saved_settings()
             case "4":
-                registrar("Opção 4 selecionada: iniciar configuração interativa", nivel="info", local="menu")
-                iniciar_configuracao()
+                record_activity("Option 4 selected: iniciar configuração interativa", log_level="info", log_origin="menu")
+                initialize_configuration()
             case "5":
-                registrar("Opção 5 selecionada: sair do programa", nivel="info", local="menu")
+                record_activity("Opção 5 selecionada: sair do programa", log_level="info", log_origin="menu")
                 print("Encerrando...\n")
                 return
             case _:
-                registrar(f"Opção inválida: {opcao}", nivel="warning", local="menu")
+                record_activity(f"Invalid option: {menu_option}", log_level="warning", log_origin="menu")
                 print("Opção inválida.")
 
-def executar_com_configuracao_salva():
-    config = ler_configuracoes()
+def execute_with_saved_config():
+    config = load_configurations()
 
     path = os.path.abspath(config.get("default_path", "."))
     output = config.get("default_output", "saida.json")
     ext = config.get("extensions", [])
     ignore = config.get("ignore", [])
 
-    registrar(f"Executando com config salva - path: {path}, output: {output}, ext: {ext}, ignore: {ignore}", nivel="debug", local="menu")
+    record_activity(f"Running with loaded settings - path: {path}, output: {output}, ext: {ext}, ignore: {ignore}", log_level="debug", log_origin="menu")
 
     if not errors.validate_directory(path):
-        registrar(f"Caminho inválido na config: {path}", nivel="error", local="menu")
+        record_activity(f"Invalid path at settings: {path}", log_level="error", log_origin="menu")
         print(f"[ERRO] Caminho inválido: {path}")
         return
 
-    estrutura = {
+    json_output = {
         "secoes": scan_directory(path, ignore, ext)
     }
 
     with open(output, 'w', encoding='utf-8') as f:
-        json.dump(format_json(estrutura), f, ensure_ascii=False, indent=2)
+        json.dump(format_json(json_output), f, ensure_ascii=False, indent=2)
 
-    registrar(f"Arquivo JSON salvo com configuração salva em: {output}", nivel="info", local="menu")
+    record_activity(f"Json file saved with saved configuration in: {output}", log_level="info", log_origin="menu")
     print(f"Arquivo salvo em: {output}")
 
-def executar_com_personalizacao():
+def run_with_custom_values():
     path = input("Caminho para escanear: ").strip()
     output = input("Nome do arquivo de saída: ").strip() or "saida.json"
     ext = input("Extensões permitidas (.pdf,.txt,...): ").strip().split(",")
@@ -80,26 +80,26 @@ def executar_com_personalizacao():
     ignore = [i.strip() for i in ignore if i.strip()]
     path = os.path.abspath(path)
 
-    registrar(f"Personalização - path: {path}, output: {output}, ext: {ext}, ignore: {ignore}", nivel="debug", local="menu")
+    record_activity(f"Personalization - path: {path}, output: {output}, ext: {ext}, ignore: {ignore}", log_level="debug", log_origin="menu")
 
     if not os.path.isdir(path):
-        registrar(f"Caminho inválido informado na personalização: {path}", nivel="error", local="menu")
+        record_activity(f"Invalid path informed in personalization: {path}", log_level="error", log_origin="menu")
         print(f"[ERRO] Caminho inválido: {path}")
         return
 
-    estrutura = {
+    json_output = {
         "secoes": scan_directory(path, ignore, ext)
     }
 
     with open(output, 'w', encoding='utf-8') as f:
-        json.dump(format_json(estrutura), f, ensure_ascii=False, indent=2)
+        json.dump(format_json(json_output), f, ensure_ascii=False, indent=2)
 
-    registrar(f"Arquivo JSON salvo com parâmetros personalizados em: {output}", nivel="info", local="menu")
+    record_activity(f"JSON File saved with custom parameters in: {output}", log_level="info", log_origin="menu")
     print(f"Arquivo salvo em: {output}")
 
-def exibir_configuracao_salva():
-    config = ler_configuracoes()
-    registrar(f"Exibindo configuração salva: {config}", nivel="debug", local="menu")
+def show_saved_settings():
+    loaded_config = load_configurations()
+    record_activity(f"Showing Save Configuration: {loaded_config}", log_level="debug", log_origin="menu")
     print("\n===== CONFIGURAÇÃO SALVA =====")
-    for chave, valor in config.items():
+    for chave, valor in loaded_config.items():
         print(f"{chave}: {valor}")
