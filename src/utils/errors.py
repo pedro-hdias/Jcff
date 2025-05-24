@@ -6,12 +6,12 @@ from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, Q
 from PySide6.QtCore import Qt
 
 from utils.context_manager import is_cli
-from utils.logger import registrar
+from utils.logger import record_activity
 
 def _emit_error(message, local, window=None):
     if is_cli():
         print(message)
-        registrar(message, nivel="error", local=local)
+        record_activity(message, nivel="error", local=local)
     else:
         QMessageBox.warning(
             window,
@@ -19,7 +19,7 @@ def _emit_error(message, local, window=None):
             message,
             QMessageBox.Ok,
         )
-        registrar(message, nivel="error", local=local)
+        record_activity(message, nivel="error", local=local)
 
 def show_simple_error(message, local):
     _emit_error(f"[ERRO] {message}", local)
@@ -55,7 +55,7 @@ def get_int_input(prompt, default=None):
         value = input(prompt)
         return True
     except ValueError:
-        registrar(f"Erro: valor inválido '{value}'.", nivel="error", local="erro")
+        record_activity(f"Erro: valor inválido '{value}'.", nivel="error", local="erro")
 
 
 def safe_json_write(path, data):
