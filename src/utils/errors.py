@@ -11,7 +11,7 @@ from utils.logger import record_activity
 def _emit_error(message, local, window=None):
     if is_cli():
         print(message)
-        record_activity(message, nivel="error", local=local)
+        record_activity(message, log_level="error", log_origin=local)
     else:
         QMessageBox.warning(
             window,
@@ -19,7 +19,7 @@ def _emit_error(message, local, window=None):
             message,
             QMessageBox.Ok,
         )
-        record_activity(message, nivel="error", local=local)
+        record_activity(message, log_level="error", log_origin=local)
 
 def show_simple_error(message, local):
     _emit_error(f"[ERRO] {message}", local)
@@ -55,7 +55,7 @@ def get_int_input(prompt, default=None):
         value = input(prompt)
         return True
     except ValueError:
-        record_activity(f"Erro: valor inválido '{value}'.", nivel="error", local="erro")
+        record_activity(f"Erro: valor inválido '{value}'.", log_level="error", log_origin="erro")
 
 
 def safe_json_write(path, data):

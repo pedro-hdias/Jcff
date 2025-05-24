@@ -25,7 +25,7 @@ class CustomExecution(QDialog):
 
     def show_dialog(self, dialog_title, dialog_message):
         record_activity(
-            f"Showing dialogue: {dialog_title} - {dialog_message}", nivel="debug", local="CustonExecution"
+            f"Showing dialogue: {dialog_title} - {dialog_message}", log_level="debug", log_origin="CustonExecution"
         )
         dialog_window = QMessageBox(self)
         dialog_window.setWindowTitle(dialog_title)
@@ -72,7 +72,7 @@ class CustomExecution(QDialog):
         path = os.path.abspath(path)
 
         record_activity(
-            f"Personalization - path: {path}, output: {output}, ext: {ext}, ignore: {ignore}", nivel="debug", local="CustonExecution")
+            f"Personalization - path: {path}, output: {output}, ext: {ext}, ignore: {ignore}", log_level="debug", log_origin="CustonExecution")
 
         json_output = {
             "secoes": file_scanner.scan_directory(path, ignore, ext)
@@ -82,7 +82,7 @@ class CustomExecution(QDialog):
             json.dump(json_formatter.format_json(json_output), f, ensure_ascii=False, indent=2)
 
         record_activity(
-            f"JSON File saved with custom parameters in: {output}", nivel="info", local="CustonExecution")
+            f"JSON File saved with custom parameters in: {output}", log_level="info", log_origin="CustonExecution")
         self.show_dialog(
             f"Arquivo JSON Gerado", f"Arquivo JSON salvo em: {output}"
         )
@@ -91,7 +91,7 @@ class CustomExecution(QDialog):
     def execute(self):
         speech("Iniciando execução personalizada")
         record_activity(
-            "Starting Personalized Execution", nivel="info", local="CustonExecution"
+            "Starting Personalized Execution", log_level="info", log_origin="CustonExecution"
         )
         main_layout = QVBoxLayout()
         input_field_layout = QFormLayout()
@@ -219,7 +219,7 @@ class CustomExecution(QDialog):
         btn_cancel_execution.setToolTip("Clique para cancelar a execução.")
         btn_cancel_execution.clicked.connect(lambda: 
             (
-                record_activity("Execução personalizada cancelada", nivel="info", local="CustonExecution"),
+                record_activity("Execução personalizada cancelada", log_level="info", log_origin="CustonExecution"),
                 self.close()
             )
         )

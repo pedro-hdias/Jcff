@@ -2,27 +2,25 @@ import os
 from datetime import datetime
 from utils.writer import write_json
 
-# Preparar dados iniciais de execução
-DATA_EXECUCAO = datetime.now().strftime("%Y-%m-%d")
-HORA_EXECUCAO = datetime.now().strftime("%H%M%S")
-NOME_ARQUIVO_LOG = f"log-{DATA_EXECUCAO.replace('-', '')}-{HORA_EXECUCAO}.log"
-PASTA_LOG = os.path.join(os.getcwd(), "logs")
-CAMINHO_LOG = os.path.join(PASTA_LOG, NOME_ARQUIVO_LOG)
+EXECUTION_DATE = datetime.now().strftime("%Y-%m-%d")
+EXECUTION_TIME = datetime.now().strftime("%H%M%S")
+LOG_FILE_NAME = f"log-{EXECUTION_DATE.replace('-', '')}-{EXECUTION_TIME}.log"
+LOGS_DIRECTORY = os.path.join(os.getcwd(), "logs")
+LOG_FILE_PATH = os.path.join(LOGS_DIRECTORY, LOG_FILE_NAME)
 
-# Estrutura base do log
-log_data = {DATA_EXECUCAO: []}
+log_data = {EXECUTION_DATE: []}
 
-def record_activity(mensagem, nivel="info", local="sistema"):
-    entrada = {
-        "level": nivel,
-        "local": local,
-        "message": mensagem,
+def record_activity(log_message, log_origin, log_level="info"):
+    log_entry = {
+        "level": log_level,
+        "local": log_origin,
+        "message": log_message,
         "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
-    log_data[DATA_EXECUCAO].append(entrada)
-    _salvar_log()
+    log_data[EXECUTION_DATE].append(log_entry)
+    _persist_log()
 
-def _salvar_log():
-    sucesso = write_json(CAMINHO_LOG, log_data)
-    if not sucesso:
+def _persist_log():
+    is_log_saved = write_json(LOG_FILE_PATH, log_data)
+    if not is_log_saved:
         print("[LOGGER] Falha ao salvar o log usando writer.py")

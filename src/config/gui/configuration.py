@@ -24,7 +24,7 @@ class ConfigurationDialog(QDialog):
 
     def show_dialog(self, dialog_title, dialog_message):
         record_activity(
-            f"Showing dialogue: {dialog_title} - {dialog_message}", nivel="info", local="ConfigurationDialog"
+            f"Showing dialogue: {dialog_title} - {dialog_message}", log_level="info", log_origin="ConfigurationDialog"
         )
         configuration_dialog = QMessageBox(self)
         configuration_dialog.setWindowTitle(dialog_title)
@@ -67,14 +67,14 @@ class ConfigurationDialog(QDialog):
     
     def _save_settings(self):
         speech("Salvando configurações.")
-        record_activity("Saving settings", nivel="info", local="ConfigurationDialog")
+        record_activity("Saving settings", log_level="info", log_origin="ConfigurationDialog")
 
         if not self._validate_input_fields():
             errors.show_simple_error("Erro ao validar os inputs.", "ConfigurationDialog")
             return
 
         record_activity(
-            "Successful validated inputs", nivel="info", local="ConfigurationDialog"
+            "Successful validated inputs", log_level="info", log_origin="ConfigurationDialog"
         )
 
         settings_dict = {
@@ -84,10 +84,10 @@ class ConfigurationDialog(QDialog):
             "ignore": [p.strip() for p in self.ignored_patterns_input.text().split(",")]
         }
         record_activity(
-            "Successful Settings Success", nivel="info", local="ConfigurationDialog"
+            "Successful Settings Success", log_level="info", log_origin="ConfigurationDialog"
         )
         record_activity(
-            f"Configurações: {settings_dict}", nivel="debug", local="ConfigurationDialog"
+            f"Configurações: {settings_dict}", log_level="debug", log_origin="ConfigurationDialog"
         )
         try:
              save_configuration(settings_dict)
@@ -99,7 +99,7 @@ class ConfigurationDialog(QDialog):
 
         speech("Configurações salvas com sucesso.")
         record_activity(
-            "saved settings with success", nivel="info", local="ConfigurationDialog"
+            "saved settings with success", log_level="info", log_origin="ConfigurationDialog"
         )
         self.show_dialog("Sucesso", "Configurações salvas com sucesso.")
         self.close()
@@ -107,7 +107,7 @@ class ConfigurationDialog(QDialog):
     def execute(self):
         speech("Iniciando configuração do programa.")
         record_activity(
-            "Starting Program Configuration", nivel="info", local="ConfigurationDialog"
+            "Starting Program Configuration", log_level="info", log_origin="ConfigurationDialog"
         )
 
         configuration_layout = QVBoxLayout()
@@ -242,7 +242,7 @@ class ConfigurationDialog(QDialog):
         btn_cancel.clicked.connect(lambda: 
             (
                 record_activity(
-                    "Execução personalizada cancelada", nivel="info", local="ConfigurationDialog"
+                    "Execução personalizada cancelada", log_level="info", log_origin="ConfigurationDialog"
                 ), 
                 self.close()
             )

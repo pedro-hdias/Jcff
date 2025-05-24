@@ -20,32 +20,32 @@ def execute_action(action_command):
                 preset_configuration.run_with_preset_config() 
             except Exception as e:
                 record_activity(
-                    f"Error executing with saved configuration: {e}", nivel="error", local="gui"
+                    f"Error executing with saved configuration: {e}", log_level="error", log_origin="gui"
                 )
         case "2":
             try:
                 custon_execution.CustomExecution().execute()
             except Exception as e:
                 record_activity(
-                    f"Error when executing with personalized values: {e}", nivel="error", local="gui"
+                    f"Error when executing with personalized values: {e}", log_level="error", log_origin="gui"
                 )
         case "3":
             try:
                 show_settings.ConfigurationDisplay().execute()
             except Exception as e:
                 record_activity(
-                    f"Error when displaying save configuration: {e}", nivel="error", local="gui"
+                    f"Error when displaying save configuration: {e}", log_level="error", log_origin="gui"
                 )
         case "4":
             try:
                 configuration_screen.execute()
             except Exception as e:
                 record_activity(
-                    f"Error when opening configuration screen: {e}", nivel="error", local="gui"
+                    f"Error when opening configuration screen: {e}", log_level="error", log_origin="gui"
                 )
         case "5":
             speech("Encerrando...\n")
-            record_activity("Closing the Program", nivel="info", local="gui")
+            record_activity("Closing the Program", log_level="info", log_origin="gui")
             sys.exit(0)
 
 def create_button(button_label, log_message, execute_action):
@@ -54,7 +54,7 @@ def create_button(button_label, log_message, execute_action):
     button.setFocusPolicy(Qt.StrongFocus)
     button.setAutoDefault(True)
     button.clicked.connect(lambda: [
-        record_activity(log_message, nivel="info", local="gui"),
+        record_activity(log_message, log_level="info", log_origin="gui"),
         execute_action(execute_action)
     ])
     button.setStyleSheet(
@@ -95,11 +95,11 @@ def show_gui_interface():
     vertical_layout.addWidget(button_V)
 
     window.setLayout(vertical_layout)
-    record_activity("Graphic interface(PySide6) initiated", nivel="info", local="gui")
+    record_activity("Graphic interface(PySide6) initiated", log_level="info", log_origin="gui")
     window.show()
     app.exec()
 
 def show_welcome_message():
     speech("Bem-vindo ao Gerador de JSON de Estrutura")
     msg = QMessageBox()
-    record_activity("Welcome message displayed", nivel="info", local="gui")
+    record_activity("Welcome message displayed", log_level="info", log_origin="gui")

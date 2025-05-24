@@ -21,10 +21,10 @@ def execute_with_arguments():
     parser.add_argument('--config', action='store_true', help='Starts interactive configuration.')
 
     args = parser.parse_args()
-    record_activity(f"Arguments received: {sys.argv[1:]}", nivel="debug", local="controller")
+    record_activity(f"Arguments received: {sys.argv[1:]}", log_level="debug", log_origin="controller")
 
     if args.config:
-        record_activity("Interactive configuration requested via argument", nivel="info", local="controller")
+        record_activity("Interactive configuration requested via argument", log_level="info", log_origin="controller")
         initialize_configuration()
         return
 
@@ -38,14 +38,14 @@ def execute_with_arguments():
     ignore_list = args.ignore if args.ignore is not None else default_config.get("ignore", [])
     allowed_ext = args.ext if args.ext is not None else default_config.get("extensions", [])
 
-    record_activity(f"Used Final Parameters- path: {base_path}, output: {output_file}, ignore: {ignore_list}, ext: {allowed_ext}", nivel="debug", local="controller")
+    record_activity(f"Used Final Parameters- path: {base_path}, output: {output_file}, ignore: {ignore_list}, ext: {allowed_ext}", log_level="debug", log_origin="controller")
 
     if not os.path.isdir(base_path):
-        record_activity(f"Invalid path informed: {base_path}", nivel="error", local="controller")
+        record_activity(f"Invalid path informed: {base_path}", log_level="error", log_origin="controller")
         print(f"[Erro] O caminho '{base_path}' não é um diretório válido.")
         return
 
-    record_activity(f"Starting scan: {base_path}", nivel="info", local="controller")
+    record_activity(f"Starting scan: {base_path}", log_level="info", log_origin="controller")
     directory_structure = {
         "secoes": scan_directory(
             path=base_path,
@@ -59,10 +59,10 @@ def execute_with_arguments():
     try:
         with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(json_output, f, ensure_ascii=False, indent=2)
-        record_activity(f"JSON file saved in: {output_file}", nivel="info", local="controller")
+        record_activity(f"JSON file saved in: {output_file}", log_level="info", log_origin="controller")
     except Exception as e:
-        record_activity(f"Error saving JSON: {str(e)}", nivel="error", local="controller")
-        record_activity(f"Context when failingsalvar: output={output_file}, estrutura={directory_structure}", nivel="debug", local="controller")
+        record_activity(f"Error saving JSON: {str(e)}", log_level="error", log_origin="controller")
+        record_activity(f"Context when failingsalvar: output={output_file}, estrutura={directory_structure}", log_level="debug", log_origin="controller")
 
 def is_executed_with_args():
     return len(sys.argv) > 1
@@ -76,18 +76,18 @@ def initialize_context():
     else:
         set_context("cli")
 
-    record_activity(f"Context defined as: {get_context().upper()}", nivel="info", local="controller")
+    record_activity(f"Context defined as: {get_context().upper()}", log_level="info", log_origin="controller")
 
     if is_executed_with_args():
-        record_activity("Arguments detected. Executing direct CLI mode.", nivel="info", local="controller")
+        record_activity("Arguments detected. Executing direct CLI mode.", log_level="info", log_origin="controller")
         execute_with_arguments()
         return False
 
     if is_gui():
-        record_activity("Mode .exe detected. Gui will be activated.", nivel="info", local="controller")
+        record_activity("Mode .exe detected. Gui will be activated.", log_level="info", log_origin="controller")
         show_gui_interface()
         return False
 
-    record_activity("No arguments detected. Entering interactive menu via terminal.", nivel="info", local="controller")
+    record_activity("No arguments detected. Entering interactive menu via terminal.", log_level="info", log_origin="controller")
     display_main_menu()
     return False

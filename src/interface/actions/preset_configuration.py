@@ -23,7 +23,7 @@ def run_with_preset_config():
     speech("Executando com configuração salva")
     preset_configuration = load_configurations()
     if not preset_configuration:
-        record_activity("No saved configuration found.", nivel="warning", local="action")
+        record_activity("No saved configuration found.", log_level="warning", log_origin="action")
         show_information_dialog(
             "Nenhuma configuração salva",
             "Nenhuma configuração salva encontrada. Por favor, configure primeiro."
@@ -38,12 +38,12 @@ def run_with_preset_config():
 
     record_activity(
         f"Running with saved settings - path: {path}, output: {output}, ext: {ext}, ignore: {ignore}", 
-        nivel="debug", local="menu"
+        log_level="debug", log_origin="menu"
     )
 
     if not errors.validate_directory(path):
         record_activity(
-            f"Invalid path at Config: {path}", nivel="error", local="actions"
+            f"Invalid path at Config: {path}", log_level="error", log_origin="actions"
         )
         errors.show_simple_error(f"[ERRO] Caminho inválido: {path}", "Actions")
         return
@@ -58,6 +58,6 @@ def run_with_preset_config():
         json.dump(format_json(json_output), f, ensure_ascii=False, indent=2)
 
     record_activity(
-        f"Json file saved with saved configuration in: {output}", nivel="info", local="actions"
+        f"Json file saved with saved configuration in: {output}", log_level="info", log_origin="actions"
     )
     show_information_dialog("Arquivo JSON Gerado", f"Arquivo JSON salvo em: {output}")

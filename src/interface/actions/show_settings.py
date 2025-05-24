@@ -17,7 +17,7 @@ class ConfigurationDisplay(QDialog):
 
     def _display_edit_settings(self):
         record_activity(
-            "Opening Settings Editing Screen", nivel="info", local="ConfigurationDisplay"
+            "Opening Settings Editing Screen", log_level="info", log_origin="ConfigurationDisplay"
         )
         settings_screen = ConfigurationDialog()
         settings_screen.execute()
@@ -26,15 +26,15 @@ class ConfigurationDisplay(QDialog):
     def execute(self):
         speech("Exibindo configuração atual")
         record_activity(
-            "Displaying current configuration", nivel="info", local="ConfigurationDisplay"
+            "Displaying current configuration", log_level="info", log_origin="ConfigurationDisplay"
         )
 
         loaded_settings = load_configurations()
 
         record_activity(
-            "loaded configuration", nivel="info", local="ConfigurationDisplay"
+            "loaded configuration", log_level="info", log_origin="ConfigurationDisplay"
         )
-        record_activity(loaded_settings, nivel="debug", local="ConfigurationDisplay")
+        record_activity(loaded_settings, log_level="debug", log_origin="ConfigurationDisplay")
 
         main_layout = QVBoxLayout()
         form_layout_fields = QFormLayout()
@@ -101,4 +101,4 @@ class ConfigurationDisplay(QDialog):
 
         self.setLayout(main_layout)
         self.show()
-        record_activity("Showing Screen", nivel="info", local="ConfigurationDisplay")
+        record_activity("Showing Screen", log_level="info", log_origin="ConfigurationDisplay")
