@@ -12,7 +12,7 @@ CAMINHO_LOG = os.path.join(PASTA_LOG, NOME_ARQUIVO_LOG)
 # Estrutura base do log
 log_data = {DATA_EXECUCAO: []}
 
-def registrar(mensagem, nivel="info", local="sistema"):
+def record_activity(mensagem, nivel="info", local="sistema"):
     entrada = {
         "level": nivel,
         "local": local,
