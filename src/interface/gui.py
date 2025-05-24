@@ -5,7 +5,7 @@ from PySide6.QtCore import Qt
 
 from config.gui.configuration import TelaConfiguracao
 from interface.actions import preset_configuration, custon_execution, show_settings
-from utils.logger import registrar
+from utils.logger import record_activity
 from utils.speech import speech
 
 app = QApplication(sys.argv)
@@ -19,25 +19,25 @@ def acao(executar):
             try:
                 preset_configuration.executar_com_configuracao_salva() 
             except Exception as e:
-                registrar(f"Erro ao executar com configuração salva: {e}", nivel="error", local="gui")
+                record_activity(f"Erro ao executar com configuração salva: {e}", nivel="error", local="gui")
         case "2":
             try:
                 custon_execution.ExecucaoCustomizada().executar()
             except Exception as e:
-                registrar(f"Erro ao executar com valores personalizados: {e}", nivel="error", local="gui")
+                record_activity(f"Erro ao executar com valores personalizados: {e}", nivel="error", local="gui")
         case "3":
             try:
                 show_settings.ExibirConfiguracao().executar()
             except Exception as e:
-                registrar(f"Erro ao exibir configuração salva: {e}", nivel="error", local="gui")
+                record_activity(f"Erro ao exibir configuração salva: {e}", nivel="error", local="gui")
         case "4":
             try:
                 tela_configuracao.executar()
             except Exception as e:
-                registrar(f"Erro ao abrir tela de configuração: {e}", nivel="error", local="gui")
+                record_activity(f"Erro ao abrir tela de configuração: {e}", nivel="error", local="gui")
         case "5":
             speech("Encerrando...\n")
-            registrar("Encerrando o programa", nivel="info", local="gui")
+            record_activity("Encerrando o programa", nivel="info", local="gui")
             sys.exit(0)
 
 def criar_botao(texto, mensagem_log, executar):
@@ -46,11 +46,11 @@ def criar_botao(texto, mensagem_log, executar):
     botao.setFocusPolicy(Qt.StrongFocus)
     botao.setAutoDefault(True)
     botao.clicked.connect(lambda: 
-    [registrar(mensagem_log, nivel="info", local="gui"), acao(executar)])
+    [record_activity(mensagem_log, nivel="info", local="gui"), acao(executar)])
     botao.setStyleSheet("background-color: #4CAF50; color: white; font-size: 16px; border-radius: 5px;")
     return botao
 
-def exibir_interface():
+def show_gui_interface():
     window.setWindowTitle("Gerador de JSON de Estrutura")
 
     ben_vindo()
@@ -81,11 +81,11 @@ def exibir_interface():
     layout_vertical.addWidget(botao5)
 
     window.setLayout(layout_vertical)
-    registrar("Interface gráfica (PySide6) iniciada", nivel="info", local="gui")
+    record_activity("Interface gráfica (PySide6) iniciada", nivel="info", local="gui")
     window.show()
     app.exec()
 
 def ben_vindo():
     speech("Bem-vindo ao Gerador de JSON de Estrutura")
     msg = QMessageBox()
-    registrar("Mensagem de boas-vindas exibida", nivel="info", local="gui")
+    record_activity("Mensagem de boas-vindas exibida", nivel="info", local="gui")

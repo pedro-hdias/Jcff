@@ -10,7 +10,7 @@ from PySide6.QtCore import Qt
 from exporter import json_formatter
 from scanner import file_scanner
 from utils import errors
-from utils.logger import registrar
+from utils.logger import record_activity
 from utils.speech import speech
 
 class ExecucaoCustomizada(QDialog):
@@ -24,7 +24,7 @@ class ExecucaoCustomizada(QDialog):
         self.input_ignorar = None
 
     def dialogs(self, titulo, mensagem):
-        registrar(f"Exibindo diálogo: {titulo} - {mensagem}", nivel="debug", local="ExecucaoCustomizada")
+        record_activity(f"Exibindo diálogo: {titulo} - {mensagem}", nivel="debug", local="ExecucaoCustomizada")
         dialogo = QMessageBox(self)
         dialogo.setWindowTitle(titulo)
         dialogo.setText(mensagem)
@@ -67,7 +67,7 @@ class ExecucaoCustomizada(QDialog):
         ignore = [i.strip() for i in ignore if i.strip()]
         path = os.path.abspath(path)
 
-        registrar(f"Personalização - path: {path}, output: {output}, ext: {ext}, ignore: {ignore}", nivel="debug", local="ExecucaoCustomizada")
+        record_activity(f"Personalização - path: {path}, output: {output}, ext: {ext}, ignore: {ignore}", nivel="debug", local="ExecucaoCustomizada")
 
         estrutura = {
             "secoes": file_scanner.scan_directory(path, ignore, ext)
@@ -76,13 +76,13 @@ class ExecucaoCustomizada(QDialog):
         with open(output, 'w', encoding='utf-8') as f:
             json.dump(json_formatter.format_json(estrutura), f, ensure_ascii=False, indent=2)
 
-        registrar(f"Arquivo JSON salvo com parâmetros personalizados em: {output}", nivel="info", local="ExecucaoCustomizada")
+        record_activity(f"Arquivo JSON salvo com parâmetros personalizados em: {output}", nivel="info", local="ExecucaoCustomizada")
         self.dialogs(f"Arquivo JSON Gerado", f"Arquivo JSON salvo em: {output}")
         self.close()
 
     def executar(self):
         speech("Iniciando execução personalizada")
-        registrar("Iniciando execução personalizada", nivel="info", local="ExecucaoCustomizada")
+        record_activity("Iniciando execução personalizada", nivel="info", local="ExecucaoCustomizada")
         layout_geral = QVBoxLayout()
         layout_campos = QFormLayout()
 
@@ -171,7 +171,7 @@ class ExecucaoCustomizada(QDialog):
         btn_cancelar = QPushButton("❌")
         btn_cancelar.setAccessibleName("Cancelar")
         btn_cancelar.setToolTip("Clique para cancelar a execução.")
-        btn_cancelar.clicked.connect(lambda: (registrar("Execução personalizada cancelada", nivel="info", local="ExecucaoCustomizada"), self.close()))
+        btn_cancelar.clicked.connect(lambda: (record_activity("Execução personalizada cancelada", nivel="info", local="ExecucaoCustomizada"), self.close()))
 
         linha_botoes = QHBoxLayout()
         linha_botoes.setAlignment(Qt.AlignCenter)

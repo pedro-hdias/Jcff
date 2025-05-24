@@ -7,7 +7,7 @@ from PySide6.QtCore import Qt
 from config.settings_reader import ler_configuracoes
 from config.settings_writer import salvar_configuracoes
 from utils import errors
-from utils.logger import registrar
+from utils.logger import record_activity
 from utils.speech import speech
 
 class TelaConfiguracao(QDialog):
@@ -23,7 +23,7 @@ class TelaConfiguracao(QDialog):
         self.input_ignorar = None
 
     def dialogs(self, titulo, mensagem):
-        registrar(f"Exibindo diálogo: {titulo} - {mensagem}", nivel="info", local="TelaConfiguracao")
+        record_activity(f"Exibindo diálogo: {titulo} - {mensagem}", nivel="info", local="TelaConfiguracao")
         dialogo = QMessageBox(self)
         dialogo.setWindowTitle(titulo)
         dialogo.setText(mensagem)
@@ -57,13 +57,13 @@ class TelaConfiguracao(QDialog):
     
     def _salvar_configuracoes(self):
         speech("Salvando configurações.")
-        registrar("Salvando configurações", nivel="info", local="TelaConfiguracao")
+        record_activity("Salvando configurações", nivel="info", local="TelaConfiguracao")
 
         if not self._validar_inputs():
             errors.show_simple_error("Erro ao validar os inputs.", "TelaConfiguracao")
             return
 
-        registrar("Inputs validados com sucesso", nivel="info", local="TelaConfiguracao")
+        record_activity("Inputs validados com sucesso", nivel="info", local="TelaConfiguracao")
 
         configuracoes = {
             "default_path": self.input_diretorio.text(),
@@ -71,8 +71,8 @@ class TelaConfiguracao(QDialog):
             "extensions": [ext.strip() for ext in self.input_extensoes.text().split(",")],
             "ignore": [p.strip() for p in self.input_ignorar.text().split(",")]
         }
-        registrar("Configurações coletadas com sucesso", nivel="info", local="TelaConfiguracao")
-        registrar(f"Configurações: {configuracoes}", nivel="debug", local="TelaConfiguracao")
+        record_activity("Configurações coletadas com sucesso", nivel="info", local="TelaConfiguracao")
+        record_activity(f"Configurações: {configuracoes}", nivel="debug", local="TelaConfiguracao")
         try:
              salvar_configuracoes(configuracoes)
         except Exception as e:
@@ -80,13 +80,13 @@ class TelaConfiguracao(QDialog):
             return
 
         speech("Configurações salvas com sucesso.")
-        registrar("Configurações salvas com sucesso", nivel="info", local="TelaConfiguracao")
+        record_activity("Configurações salvas com sucesso", nivel="info", local="TelaConfiguracao")
         self.dialogs("Sucesso", "Configurações salvas com sucesso.")
         self.close()
 
     def executar(self):
         speech("Iniciando configuração do programa.")
-        registrar("Iniciando configuração do programa", nivel="info", local="TelaConfiguracao")
+        record_activity("Iniciando configuração do programa", nivel="info", local="TelaConfiguracao")
 
         layout_geral = QVBoxLayout()
         layout_campos = QFormLayout()
@@ -171,7 +171,7 @@ class TelaConfiguracao(QDialog):
         btn_cancelar = QPushButton("❌")
         btn_cancelar.setAccessibleName("Cancelar")
         btn_cancelar.setToolTip("Clique para cancelar.")
-        btn_cancelar.clicked.connect(lambda: (registrar("Execução personalizada cancelada", nivel="info", local="TelaConfiguracao"), self.close()))
+        btn_cancelar.clicked.connect(lambda: (record_activity("Execução personalizada cancelada", nivel="info", local="TelaConfiguracao"), self.close()))
 
         linha_botoes = QHBoxLayout()
         linha_botoes.setAlignment(Qt.AlignCenter)

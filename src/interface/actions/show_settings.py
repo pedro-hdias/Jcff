@@ -6,7 +6,7 @@ from PySide6.QtCore import Qt
 from config.settings_reader import ler_configuracoes
 from config.gui.configuration import TelaConfiguracao
 from utils import errors
-from utils.logger import registrar
+from utils.logger import record_activity
 from utils.speech import speech
 
 class ExibirConfiguracao(QDialog):
@@ -16,19 +16,19 @@ class ExibirConfiguracao(QDialog):
         self.setMinimumSize(600, 400)
 
     def _abrir_edicao(self):
-        registrar("Abrindo tela de edição das configurações", nivel="info", local="ExibirConfiguracao")
+        record_activity("Abrindo tela de edição das configurações", nivel="info", local="ExibirConfiguracao")
         tela = TelaConfiguracao()
         tela.executar()
         self.close()
 
     def executar(self):
         speech("Exibindo configuração atual")
-        registrar("Exibindo configuração atual", nivel="info", local="ExibirConfiguracao") 
+        record_activity("Exibindo configuração atual", nivel="info", local="ExibirConfiguracao") 
 
         config = ler_configuracoes()
 
-        registrar("configuração carregada", nivel="info", local="ExibirConfiguracao")
-        registrar(config, nivel="debug", local="ExibirConfiguracao")
+        record_activity("configuração carregada", nivel="info", local="ExibirConfiguracao")
+        record_activity(config, nivel="debug", local="ExibirConfiguracao")
 
         layout_geral = QVBoxLayout()
         layout_campos = QFormLayout()
@@ -83,4 +83,4 @@ class ExibirConfiguracao(QDialog):
 
         self.setLayout(layout_geral)
         self.show()
-        registrar("Exibindo tela", nivel="info", local="ExibirConfiguracao")
+        record_activity("Exibindo tela", nivel="info", local="ExibirConfiguracao")

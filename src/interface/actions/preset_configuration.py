@@ -8,7 +8,7 @@ from config.gui.configuration import TelaConfiguracao
 from scanner.file_scanner import scan_directory
 from exporter.json_formatter import format_json
 from utils import errors
-from utils.logger import registrar
+from utils.logger import record_activity
 from utils.speech import speech
 
 def dialogo_informativo(title_window, message):
@@ -23,7 +23,7 @@ def executar_com_configuracao_salva():
     speech("Executando com configuração salva")
     config = ler_configuracoes()
     if not config:
-        registrar("Nenhuma configuração salva encontrada.", nivel="warning", local="action")
+        record_activity("Nenhuma configuração salva encontrada.", nivel="warning", local="action")
         dialogo_informativo("Nenhuma configuração salva", "Nenhuma configuração salva encontrada. Por favor, configure primeiro.")
         return
 
@@ -33,11 +33,11 @@ def executar_com_configuracao_salva():
     ignore = config.get("ignore", [])
     speech("Carregamento das configurações realizado. Iniciando validação das configurações.")
 
-    registrar(f"Executando com config salva - path: {path}, output: {output}, ext: {ext}, ignore: {ignore}", nivel="debug", local="menu")
+    record_activity(f"Executando com config salva - path: {path}, output: {output}, ext: {ext}, ignore: {ignore}", nivel="debug", local="menu")
 
 
     if not errors.validate_directory(path):
-        registrar(f"Caminho inválido na config: {path}", nivel="error", local="actions")
+        record_activity(f"Caminho inválido na config: {path}", nivel="error", local="actions")
         errors.show_simple_error(f"[ERRO] Caminho inválido: {path}", "Actions")
         return
 
@@ -50,6 +50,6 @@ def executar_com_configuracao_salva():
     with open(output, 'w', encoding='utf-8') as f:
         json.dump(format_json(estrutura), f, ensure_ascii=False, indent=2)
 
-    registrar(f"Arquivo JSON salvo com configuração salva em: {output}", nivel="info", local="actions")
+    record_activity(f"Arquivo JSON salvo com configuração salva em: {output}", nivel="info", local="actions")
     dialogo_informativo("Arquivo JSON Gerado", f"Arquivo JSON salvo em: {output}")
 
