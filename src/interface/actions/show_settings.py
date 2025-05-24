@@ -4,83 +4,101 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 
 from config.settings_reader import load_configurations
-from config.gui.configuration import TelaConfiguracao
+from config.gui.configuration import ConfigurationDialog
 from utils import errors
 from utils.logger import record_activity
 from utils.speech import speech
 
-class ExibirConfiguracao(QDialog):
+class ConfigurationDisplay(QDialog):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Configuração Salva")
         self.setMinimumSize(600, 400)
 
-    def _abrir_edicao(self):
-        record_activity("Abrindo tela de edição das configurações", nivel="info", local="ExibirConfiguracao")
-        tela = TelaConfiguracao()
-        tela.executar()
+    def _display_edit_settings(self):
+        record_activity(
+            "Opening Settings Editing Screen", nivel="info", local="ConfigurationDisplay"
+        )
+        settings_screen = ConfigurationDialog()
+        settings_screen.execute()
         self.close()
 
-    def executar(self):
+    def execute(self):
         speech("Exibindo configuração atual")
-        record_activity("Exibindo configuração atual", nivel="info", local="ExibirConfiguracao") 
+        record_activity(
+            "Displaying current configuration", nivel="info", local="ConfigurationDisplay"
+        )
 
-        config = load_configurations()
+        loaded_settings = load_configurations()
 
-        record_activity("configuração carregada", nivel="info", local="ExibirConfiguracao")
-        record_activity(config, nivel="debug", local="ExibirConfiguracao")
+        record_activity(
+            "loaded configuration", nivel="info", local="ConfigurationDisplay"
+        )
+        record_activity(loaded_settings, nivel="debug", local="ConfigurationDisplay")
 
-        layout_geral = QVBoxLayout()
-        layout_campos = QFormLayout()
+        main_layout = QVBoxLayout()
+        form_layout_fields = QFormLayout()
 
-        self.input_diretorio = QLineEdit(config.get("default_path", ""))
-        self.input_diretorio.setReadOnly(True)
-        self.input_diretorio.setToolTip("Diretório base")
-        self.input_diretorio.setAccessibleName("Diretório base")
+        self.input_base_directory = QLineEdit(loaded_settings.get("default_path", ""))
+        self.input_base_directory.setReadOnly(True)
+        self.input_base_directory.setToolTip("Diretório base")
+        self.input_base_directory.setAccessibleName("Diretório base")
 
-        layout_campos.addRow("Diretório base:", self.input_diretorio)
+        form_layout_fields.addRow("Diretório base:", self.input_base_directory)
 
-        self.input_saida = QLineEdit(config.get("default_output", ""))
-        self.input_saida.setReadOnly(True)
-        self.input_saida.setToolTip("Arquivo de saída")
-        self.input_saida.setAccessibleName("Arquivo de saída")
+        self.output_file_path = QLineEdit(loaded_settings.get("default_output", ""))
+        self.output_file_path.setReadOnly(True)
+        self.output_file_path.setToolTip("Arquivo de saída")
+        self.output_file_path.setAccessibleName("Arquivo de saída")
 
-        layout_campos.addRow("Arquivo de saída:", self.input_saida)
+        form_layout_fields.addRow("Arquivo de saída:", self.output_file_path)
 
-        self.input_extensoes = QLineEdit(", ".join(config.get("extensions", [])))
-        self.input_extensoes.setToolTip("Extensões permitidas")
-        self.input_extensoes.setAccessibleName("Extensões permitidas")
-        self.input_extensoes.setReadOnly(True)
+        self.input_allowed_extensions = QLineEdit(
+            ", ".join(
+                loaded_settings.get(
+                    "extensions", []
+                )
+            )
+        )
+        self.input_allowed_extensions.setToolTip("Extensões permitidas")
+        self.input_allowed_extensions.setAccessibleName("Extensões permitidas")
+        self.input_allowed_extensions.setReadOnly(True)
 
-        layout_campos.addRow("Extensões permitidas:", self.input_extensoes)
+        form_layout_fields.addRow("Extensões permitidas:", self.input_allowed_extensions)
 
-        self.input_ignorar = QLineEdit(", ".join(config.get("ignore", [])))
-        self.input_ignorar.setToolTip("Padrões a serem ignorados")
-        self.input_ignorar.setAccessibleName("Padrões a serem ignorados")
-        self.input_ignorar.setReadOnly(True)
+        self.input_ignore_patterns = QLineEdit(
+            ", ".join(
+                loaded_settings.get(
+                    "ignore", []
+                )
+            )
+        )
+        self.input_ignore_patterns.setToolTip("Padrões a serem ignorados")
+        self.input_ignore_patterns.setAccessibleName("Padrões a serem ignorados")
+        self.input_ignore_patterns.setReadOnly(True)
 
-        layout_campos.addRow("Ignorar padrões:", self.input_ignorar)
+        form_layout_fields.addRow("Ignorar padrões:", self.input_ignore_patterns)
 
-        btn_editar = QPushButton("✏️")
-        btn_editar.setToolTip("Editar configurações")
-        btn_editar.setAccessibleName("Editar configurações")
+        btn_edit_configuration = QPushButton("✏️")
+        btn_edit_configuration.setToolTip("Editar configurações")
+        btn_edit_configuration.setAccessibleName("Editar configurações")
 
-        btn_fechar = QPushButton("❌")
-        btn_fechar.setToolTip("Fechar")
-        btn_fechar.setAccessibleName("Fechar")
+        btn_close = QPushButton("❌")
+        btn_close.setToolTip("Fechar")
+        btn_close.setAccessibleName("Fechar")
 
-        linha_botoes = QHBoxLayout()
-        linha_botoes.setAlignment(Qt.AlignCenter)
-        linha_botoes.addWidget(btn_editar)
-        linha_botoes.addWidget(btn_fechar)
+        button_layout = QHBoxLayout()
+        button_layout.setAlignment(Qt.AlignCenter)
+        button_layout.addWidget(btn_edit_configuration)
+        button_layout.addWidget(btn_close)
 
-        layout_geral.addLayout(layout_campos)
-        layout_geral.addLayout(linha_botoes)
-        self.setLayout(layout_geral)
+        main_layout.addLayout(form_layout_fields)
+        main_layout.addLayout(button_layout)
+        self.setLayout(main_layout)
 
-        btn_editar.clicked.connect(lambda: self._abrir_edicao())
-        btn_fechar.clicked.connect(lambda: self.close())
+        btn_edit_configuration.clicked.connect(lambda: self._display_edit_settings())
+        btn_close.clicked.connect(lambda: self.close())
 
-        self.setLayout(layout_geral)
+        self.setLayout(main_layout)
         self.show()
-        record_activity("Exibindo tela", nivel="info", local="ExibirConfiguracao")
+        record_activity("Showing Screen", nivel="info", local="ConfigurationDisplay")

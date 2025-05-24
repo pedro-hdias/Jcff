@@ -4,7 +4,7 @@ import os
 from PySide6.QtWidgets import QMessageBox
 
 from config.settings_reader import load_configurations
-from config.gui.configuration import TelaConfiguracao
+from config.gui.configuration import ConfigurationDialog
 from scanner.file_scanner import scan_directory
 from exporter.json_formatter import format_json
 from utils import errors

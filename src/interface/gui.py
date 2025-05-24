@@ -3,7 +3,7 @@ import sys
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QMessageBox
 from PySide6.QtCore import Qt
 
-from config.gui.configuration import TelaConfiguracao
+from config.gui.configuration import ConfigurationDialog
 from interface.actions import preset_configuration, custon_execution, show_settings
 from utils.logger import record_activity
 from utils.speech import speech
@@ -11,7 +11,7 @@ from utils.speech import speech
 app = QApplication(sys.argv)
 window = QWidget()
 vertical_layout = QVBoxLayout()
-configuration_screen = TelaConfiguracao()      
+configuration_screen = ConfigurationDialog()      
 
 def execute_action(action_command):
     match action_command:
@@ -26,17 +26,23 @@ def execute_action(action_command):
             try:
                 custon_execution.CustomExecution().execute()
             except Exception as e:
-                record_activity(f"Error when executing with personalized values: {e}", nivel="error", local="gui")
+                record_activity(
+                    f"Error when executing with personalized values: {e}", nivel="error", local="gui"
+                )
         case "3":
             try:
-                show_settings.ExibirConfiguracao().executar()
+                show_settings.ConfigurationDisplay().execute()
             except Exception as e:
-                record_activity(f"Error when displaying save configuration: {e}", nivel="error", local="gui")
+                record_activity(
+                    f"Error when displaying save configuration: {e}", nivel="error", local="gui"
+                )
         case "4":
             try:
-                configuration_screen.executar()
+                configuration_screen.execute()
             except Exception as e:
-                record_activity(f"Error when opening configuration screen: {e}", nivel="error", local="gui")
+                record_activity(
+                    f"Error when opening configuration screen: {e}", nivel="error", local="gui"
+                )
         case "5":
             speech("Encerrando...\n")
             record_activity("Closing the Program", nivel="info", local="gui")
@@ -67,7 +73,9 @@ def show_gui_interface():
     speech("Menu Principal")
 
     button_I = create_button("Executar com configuração salva", "Option 1 selected", "1")
-    button_II = create_button("Executar com valores personalizados", "Option 2 selected", "2")
+    button_II = create_button(
+        "Executar com valores personalizados", "Option 2 selected", "2"
+    )
     button_III = create_button("Ver configuração salva", "Option 3 selected", "3")
     button_IV = create_button("Configurar", "Option 4 selected", "4")
     button_V = create_button("Sair", "Option 5 selected", "5")
