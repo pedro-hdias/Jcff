@@ -10,14 +10,14 @@ from utils.speech import speech
 
 app = QApplication(sys.argv)
 window = QWidget()
-layout_vertical = QVBoxLayout()
+vertical_layout = QVBoxLayout()
 configuration_screen = TelaConfiguracao()      
 
 def execute_action(action_command):
     match action_command:
         case "1":
             try:
-                preset_configuration.executar_com_configuracao_salva() 
+                preset_configuration.run_with_preset_config() 
             except Exception as e:
                 record_activity(f"Error executing with saved configuration: {e}", nivel="error", local="gui")
         case "2":
@@ -80,11 +80,11 @@ def show_gui_interface():
     line_II.addWidget(button_III)
     line_II.addWidget(button_IV)
 
-    layout_vertical.addLayout(line_I)
-    layout_vertical.addLayout(line_II)
-    layout_vertical.addWidget(button_V)
+    vertical_layout.addLayout(line_I)
+    vertical_layout.addLayout(line_II)
+    vertical_layout.addWidget(button_V)
 
-    window.setLayout(layout_vertical)
+    window.setLayout(vertical_layout)
     record_activity("Graphic interface(PySide6) initiated", nivel="info", local="gui")
     window.show()
     app.exec()
